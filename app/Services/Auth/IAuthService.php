@@ -12,5 +12,7 @@ interface IAuthService
     public function logoutOfAllDevices(User $user);
     public function sendForgotPasswordEmail(User $user);
     public function sendForgotPasswordEmailWithEmail(string $email);
-    public function resetPassword(array $payload) : bool;
+    public function resetPassword(array $payload) : string;
+    public function loginWithRefreshToken(array $data): array;
+    public function changePassword(User $user,string $password, bool $logout = false);
 }

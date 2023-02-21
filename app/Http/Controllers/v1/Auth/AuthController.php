@@ -6,11 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\ForgotPasswordRequest;
 use App\Http\Requests\Auth\MobileLoginRequest;
 use App\Http\Requests\Auth\ResetPasswordRequest;
+use App\Http\Requests\ChangePasswordRequest;
+use App\Http\Requests\LoginWithRefreshTokenRequest;
 use App\Models\User;
 use App\Services\Auth\IAuthService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Password;
 
 class AuthController extends Controller
 {
@@ -48,10 +51,22 @@ class AuthController extends Controller
 
     public function resetPassword(ResetPasswordRequest $request): JsonResponse
     {
-        if($this->authService->resetPassword($request->all())){
-            return $this->successResponse('password changed successfully');
+       // === Password::PASSWORD_RESET
+        $status = $this->authService->resetPassword($request->all());
+        switch ($status) {
+            case Password::PASSWORD_RESET:
+                // Once password reset is successful, log the user out of all devices
+                /** @var User $user */
+                $user = User::query()->where('email', $request->get('email'))->first();
+                if($user) {
+                    $this->authService->logoutOfAllDevices($user);
+                }
+                return $this->successResponse('password changed successfully');
+            case Password::INVALID_TOKEN:
+                return $this->errorResponse('token has expired');
+            default:
+                return $this->errorResponse('invalid token');
         }
-        return $this->errorResponse('we could not change your password');
     }
 
     public function logoutOfAllDevices(Request $request): Response
@@ -59,6 +74,18 @@ class AuthController extends Controller
         /** @var User $user */
         $user = $request->user();
         $this->authService->logoutOfAllDevices($user);
+        return $this->noContent();
+    }
+
+    public function refreshToken(LoginWithRefreshTokenRequest $request): JsonResponse
+    {
+        return $this->successResponse($this->authService->loginWithRefreshToken($request->all()));
+    }
+
+    public function changePassword(ChangePasswordRequest $request): Response
+    {
+        //TODO implement 2FA in the future
+        $this->authService->changePassword($request->user(), $request->get('new_password'), $request->get('logout_of_all_other_devices'));
         return $this->noContent();
     }
 }
