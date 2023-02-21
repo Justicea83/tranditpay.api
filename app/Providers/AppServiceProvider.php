@@ -2,6 +2,12 @@
 
 namespace App\Providers;
 
+use App\Services\Auth\AuthService;
+use App\Services\Auth\IAuthService;
+use App\Services\Collection\CollectionService;
+use App\Services\Collection\ICollectionService;
+use App\Services\UserManagement\IUserManagementService;
+use App\Services\UserManagement\UserManagementService;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -11,7 +17,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton(IAuthService::class, AuthService::class);
+        $this->app->singleton(ICollectionService::class, CollectionService::class);
+        $this->app->singleton(IUserManagementService::class, UserManagementService::class);
     }
 
     /**

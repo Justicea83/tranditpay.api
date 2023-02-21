@@ -19,6 +19,7 @@ use Laravel\Passport\HasApiTokens;
  * @property mixed created_at
  * @property mixed email_verified_at
  * @property mixed phone_verified_at
+ * @property float|int|mixed|string $suspended_until
  */
 class User extends Authenticatable
 {
@@ -30,7 +31,9 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
+        'first_name',
+        'last_name',
+        'phone',
         'email',
         'password',
     ];
@@ -52,5 +55,7 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'phone_verified_at' => 'datetime',
     ];
+
 }

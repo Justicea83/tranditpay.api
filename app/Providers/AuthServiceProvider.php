@@ -3,8 +3,6 @@
 namespace App\Providers;
 
 // use Illuminate\Support\Facades\Gate;
-use App\Services\Auth\AuthService;
-use App\Services\Auth\IAuthService;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Laravel\Passport\Passport;
 
@@ -31,6 +29,5 @@ class AuthServiceProvider extends ServiceProvider
 
     public function register()
     {
-        $this->app->singleton(IAuthService::class,AuthService::class);
     }
 }
