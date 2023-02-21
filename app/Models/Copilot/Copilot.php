@@ -19,6 +19,8 @@ class Copilot extends Model
 {
     use HasFactory;
 
+    protected $fillable = ['merchant_id', 'pilot_id'];
+
     public function pilot(): BelongsTo
     {
         return $this->belongsTo(User::class, 'pilot_id');

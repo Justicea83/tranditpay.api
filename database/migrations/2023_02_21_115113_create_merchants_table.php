@@ -15,7 +15,7 @@ return new class extends Migration
         Schema::create('merchants', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('primary_email')->unique();
+            $table->string('primary_email')->unique()->nullable();
             $table->string('primary_phone')->unique()->nullable();
             $table->foreignId('country_id')->nullable()->constrained();
             $table->boolean('blocked')->default(false);

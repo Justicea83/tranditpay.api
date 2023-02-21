@@ -14,6 +14,8 @@ class Merchant extends Model
 {
     use HasFactory;
 
+    protected $fillable = ['name', 'country_id', 'owner_id'];
+
     public function branches(): HasMany
     {
         return $this->hasMany(Branch::class);

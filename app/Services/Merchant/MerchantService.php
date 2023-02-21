@@ -36,17 +36,16 @@ class MerchantService implements IMerchantService
         DB::beginTransaction();
 
         try {
-            // create merchant
-            /** @var Merchant $createdMerchant */
-            $this->createMerchant($user, $merchant);
+            /** @var User $user */
+            $user = $this->userManagementService->createUser($userData);
 
-            $this->userManagementService->createUser($userData);
+            $merchant['owner_id'] = $user->id;
+            $this->createMerchant($user, $merchant);
 
         } catch (Exception $e) {
             DB::rollBack();
             throw $e;
         }
-
         DB::commit();
     }
 

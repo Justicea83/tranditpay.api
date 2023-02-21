@@ -25,8 +25,8 @@ class CreateMerchantRequest extends FormRequest
         return [
             //merchant info
             'merchant.name' => 'required',
-            'merchant.primary_email' => 'email:rfc,dns|unique:merchants,primary_email',
-            'merchant.primary_phone' => 'required',
+            'merchant.primary_email' => 'email:rfc,dns|unique:merchants,primary_email|nullable',
+            'merchant.primary_phone' => 'nullable',
             'merchant.country_id' => 'required',
             'merchant.website' => 'url|nullable',
             'merchant.about' => 'string|nullable',

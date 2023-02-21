@@ -3,6 +3,7 @@
 namespace App\Services\UserManagement;
 
 use App\Models\Copilot\Copilot;
+use App\Models\Copilot\CopilotRestriction;
 use App\Models\Merchant\Merchant;
 use App\Models\User;
 use App\Services\Auth\IAuthService;
@@ -17,18 +18,20 @@ class UserManagementService implements IUserManagementService
 {
     private User $userModel;
     private Copilot $copilotModel;
+    private CopilotRestriction $copilotRestrictionModel;
     private IAuthService $authService;
     private Merchant $merchantModel;
 
     function __construct(
         User     $userModel, IAuthService $authService, Copilot $copilotModel,
-        Merchant $merchantModel
+        Merchant $merchantModel,CopilotRestriction $copilotRestrictionModel
     )
     {
         $this->userModel = $userModel;
         $this->authService = $authService;
         $this->copilotModel = $copilotModel;
         $this->merchantModel = $merchantModel;
+        $this->copilotRestrictionModel = $copilotRestrictionModel;
     }
 
     public function createUser(array $payload, bool $resetPassword = false): Model
@@ -107,11 +110,12 @@ class UserManagementService implements IUserManagementService
         /** @var Copilot $copilot */
         $copilot = $this->copilotModel->query()->create([
             'merchant_id' => $merchantId,
-            'pilot' => $payload['user_id'],
+            'pilot_id' => $payload['user_id'],
         ]);
         foreach ($payload['restrictions'] as $restriction) {
-            $copilot->restrictions()->create([
-                'restriction_id' => $restriction
+            $this->copilotRestrictionModel->query()->create([
+                'copilot_id' => $copilot->id,
+                'restriction_id' => $restriction,
             ]);
         }
 

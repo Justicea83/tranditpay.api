@@ -14,7 +14,7 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('merchant_id')->constrained();
             $table->boolean('blocked')->default(false);
-            $table->dateTime('suspended_until')->nullable();
+            $table->timestamp('suspended_until')->nullable();
             $table->foreignId('pilot_id')->constrained('users');
             $table->unique(['merchant_id', 'pilot_id']);
             $table->timestamps();

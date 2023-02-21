@@ -8,4 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class CopilotRestriction extends Model
 {
     use HasFactory;
+
+    protected $fillable = ['copilot_id', 'restriction_id'];
 }

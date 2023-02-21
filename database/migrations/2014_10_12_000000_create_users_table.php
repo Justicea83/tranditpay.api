@@ -17,14 +17,13 @@ return new class extends Migration {
             $table->string('last_name')->nullable();
             $table->string('email')->unique();
             $table->boolean('blocked')->default(false);
-            $table->dateTime('suspended_until')->nullable();
+            $table->timestamp('suspended_until')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('phone')->unique();
             $table->timestamp('phone_verified_at')->nullable();
             $table->string('password');
             $table->enum('status', AppConstants::USER_STATUSES)
                 ->default(AppConstants::USER_STATUS_ACTIVE);
-            $table->boolean('blocked')->default(false);
             $table->rememberToken();
             $table->timestamps();
         });

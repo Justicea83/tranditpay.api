@@ -14,7 +14,7 @@ Route::prefix('v1/user-mgmt')->group(function () {
         });
 
         Route::prefix('copilots')->group(function () {
-            Route::post('', [UserManagementController::class, 'addCopilot']);
+            Route::post('{merchantId}', [UserManagementController::class, 'addCopilot']);
             Route::delete('', [UserManagementController::class, 'removeCopilot']);
             Route::patch('block', [UserManagementController::class, 'blockCopilot']);
             Route::patch('unblock', [UserManagementController::class, 'unBlockCopilot']);
