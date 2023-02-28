@@ -17,9 +17,12 @@ class DatabaseSeeder extends Seeder
         $this->call(CountryStateSeeder::class);
         $this->call(RestrictionsTableSeeder::class);
 
+        $this->call(FormFieldTypesTableSeeder::class);
+
         if (app()->environment(['local'])) {
             $this->call(CompleteMerchant::class);
         }
+
 
         // \App\Models\User::factory(10)->create();
 
