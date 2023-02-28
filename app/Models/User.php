@@ -3,9 +3,12 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\Merchant\Merchant;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Collection;
 use Laravel\Passport\HasApiTokens;
 
 /**
@@ -20,6 +23,7 @@ use Laravel\Passport\HasApiTokens;
  * @property mixed email_verified_at
  * @property mixed phone_verified_at
  * @property float|int|mixed|string $suspended_until
+ * @property Collection $merchants
  */
 class User extends Authenticatable
 {
@@ -57,5 +61,10 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'phone_verified_at' => 'datetime',
     ];
+
+    public function merchants(): HasMany
+    {
+        return $this->hasMany(Merchant::class, 'owner_id');
+    }
 
 }

@@ -51,6 +51,7 @@ class UserManagementService implements IUserManagementService
     {
         $pageSize = request()->query->get('page-size') ?? 20;
         $page = request()->query->get('page') ?? 1;
+
         /** @var Merchant $merchant */
         $merchant = $this->merchantModel->query()->find($merchantId);
         if (!$merchant) {
