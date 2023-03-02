@@ -14,7 +14,7 @@ return new class extends Migration
     {
         Schema::create('form_fields', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('form_section_id')->constrained();
+            $table->foreignId('form_section_id')->constrained()->cascadeOnDelete();
             $table->foreignId('form_field_type_id')->nullable()->constrained()->nullOnDelete();
             $table->boolean('required')->default(false);
             $table->string('status')->default(StatusUtils::ACTIVE);

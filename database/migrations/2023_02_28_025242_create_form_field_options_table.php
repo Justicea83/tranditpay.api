@@ -15,6 +15,7 @@ return new class extends Migration
         Schema::create('form_field_options', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->foreignId('form_field_id')->constrained()->cascadeOnDelete();
             $table->string('status')->default(StatusUtils::ACTIVE);
             $table->timestamps();
         });

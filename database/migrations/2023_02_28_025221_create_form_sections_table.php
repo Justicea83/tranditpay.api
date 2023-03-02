@@ -14,7 +14,7 @@ return new class extends Migration
     {
         Schema::create('form_sections', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('form_id')->constrained();
+            $table->foreignId('form_id')->constrained()->cascadeOnDelete();
             $table->string('title')->nullable();
             $table->string('status')->default(StatusUtils::ACTIVE);
             $table->string('description')->nullable();
