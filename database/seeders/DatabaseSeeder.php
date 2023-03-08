@@ -18,6 +18,8 @@ class DatabaseSeeder extends Seeder
         $this->call(RestrictionsTableSeeder::class);
 
         $this->call(FormFieldTypesTableSeeder::class);
+        $this->call(PaymentApiTableSeeder::class);
+        $this->call(SettlementModeTableSeeder::class);
 
         if (app()->environment(['local'])) {
             $this->call(CompleteMerchant::class);

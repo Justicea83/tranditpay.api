@@ -5,9 +5,12 @@ namespace Database\Seeders\Test;
 use App\Models\Collection\Country;
 use App\Models\Merchant\Merchant;
 use App\Models\Payment\PaymentType;
+use App\Models\Payment\SettlementBank;
+use App\Models\Payment\SettlementMode;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Throwable;
 
 class CompleteMerchant extends Seeder
 {
@@ -46,10 +49,21 @@ class CompleteMerchant extends Seeder
                 PaymentType::factory()->count(250)->create([
                     'merchant_id' => $merchant->id
                 ]);
+
+                $settlementMode = SettlementMode::query()->where('name', 'bank')->first();
+                if ($settlementMode) {
+                    SettlementBank::query()->firstOrCreate([
+                        'merchant_id' => $merchant->id,
+                        'settlement_mode_id' => $settlementMode->id,
+                        'bank_name' => 'Access Bank',
+                        'account_name' => 'Justice Essien',
+                        'account_number' => '08100000000',
+                    ]);
+                }
             }
 
             DB::commit();
-        } catch (\Throwable $t) {
+        } catch (Throwable $t) {
             DB::rollBack();
             throw $t;
         }
