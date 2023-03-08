@@ -15,13 +15,14 @@ return new class extends Migration {
             $table->id();
             $table->string('first_name')->nullable();
             $table->string('last_name')->nullable();
-            $table->string('email')->unique();
+            $table->string('email')->nullable()->unique();
             $table->boolean('blocked')->default(false);
             $table->timestamp('suspended_until')->nullable();
             $table->timestamp('email_verified_at')->nullable();
-            $table->string('phone')->unique();
+            $table->string('phone')->nullable()->unique();
             $table->timestamp('phone_verified_at')->nullable();
             $table->string('password');
+            $table->string('avatar')->nullable();
             $table->enum('status', AppConstants::USER_STATUSES)
                 ->default(AppConstants::USER_STATUS_ACTIVE);
             $table->rememberToken();
