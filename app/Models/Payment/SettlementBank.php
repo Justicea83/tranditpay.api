@@ -5,6 +5,11 @@ namespace App\Models\Payment;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @property mixed $account_number
+ * @property mixed $bank_name
+ * @property array $extra_data
+ */
 class SettlementBank extends Model
 {
     use HasFactory;

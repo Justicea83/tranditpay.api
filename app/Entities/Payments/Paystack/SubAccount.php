@@ -10,7 +10,7 @@ class SubAccount extends PaystackConfig
     public string $business_name;
     public string $settlement_bank;
     public string $account_number;
-    public string $percentage_charge;
+    public float $percentage_charge;
     public string $description;
     public string $primary_contact_email;
     public string $primary_contact_phone;
@@ -52,50 +52,50 @@ class SubAccount extends PaystackConfig
     }
 
     /**
-     * @param string $percentage_charge
+     * @param float $percentage_charge
      * @return SubAccount
      */
-    public function setPercentageCharge(string $percentage_charge): SubAccount
+    public function setPercentageCharge(float $percentage_charge): SubAccount
     {
         $this->percentage_charge = $percentage_charge;
         return $this;
     }
 
     /**
-     * @param string $description
+     * @param string|null $description
      * @return SubAccount
      */
-    public function setDescription(string $description): SubAccount
+    public function setDescription(?string $description): SubAccount
     {
         $this->description = $description;
         return $this;
     }
 
     /**
-     * @param string $primary_contact_email
+     * @param string|null $primary_contact_email
      * @return SubAccount
      */
-    public function setPrimaryContactEmail(string $primary_contact_email): SubAccount
+    public function setPrimaryContactEmail(?string $primary_contact_email): SubAccount
     {
         $this->primary_contact_email = $primary_contact_email;
         return $this;
     }
 
     /**
-     * @param string $primary_contact_phone
+     * @param string|null $primary_contact_phone
      * @return SubAccount
      */
-    public function setPrimaryContactPhone(string $primary_contact_phone): SubAccount
+    public function setPrimaryContactPhone(?string $primary_contact_phone): SubAccount
     {
         $this->primary_contact_phone = $primary_contact_phone;
         return $this;
     }
 
-    public function create(array $data): ?object
+    public function create(): ?object
     {
         $response = Http::withToken($this->secretKey)->post(
             $this->url,
-            $data
+            (array)$this
         );
 
         if ($response->successful() && $response->json()['status'])

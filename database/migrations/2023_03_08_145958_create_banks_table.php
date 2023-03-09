@@ -15,7 +15,7 @@ return new class extends Migration
         Schema::create('banks', function (Blueprint $table) {
             $table->id();
             $table->string('name')->nullable();
-            $table->string(StatusUtils::ACTIVE);
+            $table->string('status')->default(StatusUtils::ACTIVE);
             $table->foreignId('country_id')->constrained();
             $table->string('type')->nullable();
             $table->timestamps();
