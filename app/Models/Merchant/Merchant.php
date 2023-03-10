@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Laravel\Scout\Searchable;
 
 /**
  * @property int $owner
@@ -18,10 +19,13 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property mixed $name
  * @property mixed $primary_email
  * @property mixed $primary_phone
+ * @property mixed $website
+ * @property mixed $address
+ * @property mixed $id
  */
 class Merchant extends Model
 {
-    use HasFactory;
+    use HasFactory, Searchable;
 
     protected $fillable = ['name', 'country_id', 'owner_id'];
 

@@ -22,6 +22,7 @@ return new class extends Migration {
             $table->string('phone')->nullable()->unique();
             $table->timestamp('phone_verified_at')->nullable();
             $table->string('password');
+            $table->foreignId('country_id')->nullable()->constrained();
             $table->string('avatar')->nullable();
             $table->enum('status', AppConstants::USER_STATUSES)
                 ->default(AppConstants::USER_STATUS_ACTIVE);

@@ -1,18 +1,19 @@
 <?php
 
-namespace App\Models\Form;
+namespace App\Models\Payment;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 /**
+ * @property mixed $id
  * @property mixed $name
  */
-class FormFieldType extends Model
+class PaymentMode extends Model
 {
     use HasFactory;
 
-    public $timestamps = false;
-
-    protected $fillable = ['title', 'name'];
+    protected $fillable = [
+        'name', 'country_id'
+    ];
 }
