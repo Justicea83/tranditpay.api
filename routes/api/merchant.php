@@ -15,5 +15,6 @@ Route::prefix('v1/merchants')->group(function () {
         Route::get('{id}/payment-types', [MerchantsController::class, 'getPaymentTypes']);
         Route::get('{id}/payment-types/{paymentTypeId}/form', [MerchantsController::class, 'getForm']);
         Route::get('payment-modes', [MerchantsController::class, 'getPaymentModes']);
+        Route::post('{id}/pay', [MerchantsController::class, 'pay']);
     });
 });

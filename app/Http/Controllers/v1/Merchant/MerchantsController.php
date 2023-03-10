@@ -4,6 +4,7 @@ namespace App\Http\Controllers\v1\Merchant;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Merchant\CreateMerchantRequest;
+use App\Http\Requests\Merchant\PayMerchantRequest;
 use App\Services\Merchant\IMerchantService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
@@ -41,5 +42,9 @@ class MerchantsController extends Controller
     public function getPaymentModes(): JsonResponse
     {
         return $this->successResponse($this->merchantService->getPaymentModes(request()->user()));
+    }
+
+    public function pay(PayMerchantRequest $request, int $merchantId){
+
     }
 }
