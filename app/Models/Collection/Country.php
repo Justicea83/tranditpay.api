@@ -21,4 +21,11 @@ class Country extends Model
     {
         return $this->hasMany(State::class);
     }
+
+    public static function findByISO2(string $iso2): ?Country
+    {
+        /** @var Country $country */
+        $country = self::query()->where('iso2', $iso2)->first();
+        return $country;
+    }
 }
