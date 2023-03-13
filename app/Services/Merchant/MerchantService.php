@@ -11,6 +11,7 @@ use App\Models\Merchant\Merchant;
 use App\Models\Payment\PaymentMode;
 use App\Models\Payment\PaymentType;
 use App\Models\User;
+use App\Services\Payments\Transaction\ITransactionService;
 use App\Services\UserManagement\IUserManagementService;
 use App\Utils\CacheKeys;
 use App\Utils\StatusUtils;
@@ -26,6 +27,7 @@ use Stevebauman\Location\Facades\Location;
 class MerchantService implements IMerchantService
 {
     private IUserManagementService $userManagementService;
+    private ITransactionService $transactionService;
     private Merchant $merchantModel;
     private PaymentType $paymentTypeModel;
     private PaymentMode $paymentModeModel;
@@ -34,13 +36,15 @@ class MerchantService implements IMerchantService
         IUserManagementService $userManagementService,
         Merchant               $merchantModel,
         PaymentType            $paymentTypeModel,
-        PaymentMode            $paymentModeModel
+        PaymentMode            $paymentModeModel,
+        ITransactionService    $transactionService
     )
     {
         $this->userManagementService = $userManagementService;
         $this->merchantModel = $merchantModel;
         $this->paymentTypeModel = $paymentTypeModel;
         $this->paymentModeModel = $paymentModeModel;
+        $this->transactionService = $transactionService;
     }
 
     /**
@@ -178,5 +182,12 @@ class MerchantService implements IMerchantService
                 'name' => $paymentMode->name,
             ]);
 
+    }
+
+    public function pay(User $user, int $merchantId, array $payload)
+    {
+        // TODO, Charge the payment method
+        // TODO,  Save the form response
+        $this->transactionService->processPayment($user, $merchantId, $payload);
     }
 }
