@@ -3,6 +3,8 @@
 namespace Database\Seeders;
 
 use App\Models\Collection\Country;
+use App\Models\Payment\PaymentApi;
+use App\Models\Payment\PaymentApiCharge;
 use App\Models\Payment\PaymentMode;
 use Illuminate\Database\Seeder;
 
@@ -18,17 +20,52 @@ class PaymentModeTableSeeder extends Seeder
 
         $payments = [
             [
-                'name' => 'card',
-                'country_id' => null
+                'model' => [
+                    'name' => 'card',
+                    'country_id' => null
+                ],
+                'charges' => [
+                    'paystack' => [
+                        'fixed' => false,
+                        'charge' => 1.95
+                    ]
+                ]
             ],
             [
-                'name' => 'mobile_money',
-                'country_id' => $gh->id
+                'model' => [
+                    'name' => 'mobile_money',
+                    'country_id' => $gh->id
+                ],
+                'charges' => [
+                    'paystack' => [
+                        'fixed' => true,
+                        'charge' => 1
+                    ]
+                ]
             ],
         ];
 
         foreach ($payments as $payment) {
-            PaymentMode::query()->firstOrCreate($payment);
+            /** @var PaymentMode $paymentMode */
+            $paymentMode = PaymentMode::query()->firstOrCreate($payment['model']);
+
+            foreach ($payment['charges'] as $apiName => $chargeInfo) {
+                /** @var PaymentApi $paymentApi */
+                $paymentApi = PaymentApi::query()->where('name', $apiName)->first();
+
+                $count = PaymentApiCharge::query()->where('payment_api_id', $paymentApi->id)->where('payment_mode_id', $paymentMode->id)->count();
+                if ($count) {
+                    continue;
+                }
+                PaymentApiCharge::query()->create(
+                    array_merge(
+                        $chargeInfo,
+                        [
+                            'payment_api_id' => $paymentApi->id,
+                            'payment_mode_id' => $paymentMode->id,
+                        ])
+                );
+            }
         }
     }
 }
