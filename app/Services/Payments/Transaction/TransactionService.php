@@ -5,6 +5,8 @@ namespace App\Services\Payments\Transaction;
 use App\Entities\PendingRequests\PendingAction;
 use App\Entities\PendingRequests\PendingPayFromForm;
 use App\Entities\Response\Payments\PaymentResponse;
+use App\Models\Form\FormField;
+use App\Models\Form\FormResponse;
 use App\Models\Merchant\Merchant;
 use App\Models\Payment\PaymentApi;
 use App\Models\Payment\PendingRequest;
@@ -14,6 +16,7 @@ use App\Services\Payments\IPaymentService;
 use App\Utils\AppUtils;
 use App\Utils\Payments\Enums\FundsLocation;
 use App\Utils\Payments\Enums\TransactionStatus;
+use App\Utils\StatusUtils;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
@@ -25,15 +28,20 @@ class TransactionService implements ITransactionService
     private IPaymentService $paymentService;
     private Merchant $merchant;
     private PendingRequest $pendingRequest;
+    private FormResponse $formResponse;
+    private FormField $formField;
 
     public function __construct(
-        PaymentApi $paymentApi, IPaymentService $paymentService, Merchant $merchant, PendingRequest $pendingRequest
+        PaymentApi   $paymentApi, IPaymentService $paymentService, Merchant $merchant, PendingRequest $pendingRequest,
+        FormResponse $formResponse, FormField $formField
     )
     {
         $this->paymentApi = $paymentApi;
         $this->paymentService = $paymentService;
         $this->merchant = $merchant;
         $this->pendingRequest = $pendingRequest;
+        $this->formResponse = $formResponse;
+        $this->formField = $formField;
     }
 
     public function processPayment(User $user, int $merchantId, array $payload)
@@ -97,7 +105,7 @@ class TransactionService implements ITransactionService
 
     public function processPendingRequests()
     {
-        $this->pendingRequest->query()->where('status', TransactionStatus::Pending->value)
+        $this->pendingRequest->query()->where('status', StatusUtils::PENDING)
             ->chunkById(100, function (Collection $pendingRequests) {
                 /** @var PendingRequest $pendingRequest */
                 foreach ($pendingRequests as $pendingRequest) {
@@ -110,16 +118,13 @@ class TransactionService implements ITransactionService
     {
         switch ($pendingRequest->type) {
             case PendingAction::TYPE_FROM_FORM:
-                dd(unserialize($pendingRequest->payload));
                 /** @var PendingPayFromForm $payload */
                 $payload = unserialize($pendingRequest->payload);
 
                 if (
                     $this->paymentService->verifyTransaction($payload->provider, $pendingRequest->reference)->valid
                 ) {
-                    // TODO submit the filled form
-                    // TODO create a transaction
-                    $transaction = Transaction::builder()
+                    Transaction::builder()
                         ->setReference($pendingRequest->reference)
                         ->setTaxAmount($payload->taxAmount)
                         ->setAmount($payload->amount)
@@ -130,6 +135,31 @@ class TransactionService implements ITransactionService
                         ->setPaymentMethod($payload->method)
                         ->setCurrency($payload->currency)
                         ->create();
+
+                    if ($payload->responses) {
+                        $firstResponse = $payload->responses[0]['form_field_id'];
+                        /** @var FormField $formField */
+                        $formField = $this->formField->query()->find($firstResponse);
+
+                        if ($formField) {
+                            /** @var FormResponse $formResponse */
+                            $formResponse = $this->formResponse->query()->create([
+                                'form_id' => $formField->formSection->form->id,
+                                'reference' => $pendingRequest->reference,
+                                'user_id' => $pendingRequest->owner_id
+                            ]);
+
+                            foreach ($payload->responses as $response) {
+                                $formResponse->fieldResponses()->create([
+                                    'form_field_id' => $response['form_field_id'],
+                                    'response' => $response['value']
+                                ]);
+                            }
+                        }
+                    }
+
+                    $pendingRequest->status = StatusUtils::COMPLETED;
+                    $pendingRequest->save();
                 }
                 break;
         }

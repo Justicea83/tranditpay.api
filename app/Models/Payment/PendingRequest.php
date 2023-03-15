@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property object $payload
  * @property string $reference
  * @property int $owner_id
+ * @property mixed|string $status
  */
 class PendingRequest extends Model
 {

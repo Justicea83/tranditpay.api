@@ -72,6 +72,12 @@ class PaymentService implements IPaymentService
 
     public function verifyTransaction(string $provider, string $ref): VerifyPaymentResponse
     {
+        if (config('app.env') == 'local') {
+            return VerifyPaymentResponse::instance()
+                ->setReference($ref)
+                ->setValid(true);
+        }
+
         switch ($provider) {
             case PaystackUtility::NAME:
                 return VerifyPaymentResponse::instance()

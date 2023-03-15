@@ -15,6 +15,7 @@ use Illuminate\Support\Collection;
  * @property FormFieldType $formFieldType
  * @property Collection $options
  * @property mixed|string $form_field_type_id
+ * @property FormSection $formSection
  */
 class FormField extends Model
 {
@@ -28,5 +29,10 @@ class FormField extends Model
     public function formFieldType(): BelongsTo
     {
         return $this->belongsTo(FormFieldType::class, 'form_field_type_id');
+    }
+
+    public function formSection(): BelongsTo
+    {
+        return $this->belongsTo(FormSection::class);
     }
 }

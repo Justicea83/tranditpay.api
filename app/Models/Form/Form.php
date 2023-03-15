@@ -12,6 +12,7 @@ use Illuminate\Support\Collection;
 
 /**
  * @property Collection $sections
+ * @property mixed $id
  */
 class Form extends Model
 {
