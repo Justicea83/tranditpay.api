@@ -11,7 +11,6 @@ use App\Services\Payments\Paystack\IPaystackService;
 use App\Utils\AppConstants;
 use App\Utils\Payments\FlutterwaveUtility;
 use App\Utils\Payments\PaystackUtility;
-use Illuminate\Http\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 class PaymentService implements IPaymentService
@@ -71,9 +70,17 @@ class PaymentService implements IPaymentService
         return $response;
     }
 
-    public function verifyTransaction(User $user, string $ref): VerifyPaymentResponse
+    public function verifyTransaction(string $provider, string $ref): VerifyPaymentResponse
     {
-        // TODO: Implement verifyTransaction() method.
+        switch ($provider) {
+            case PaystackUtility::NAME:
+                return VerifyPaymentResponse::instance()
+                    ->setReference($ref)
+                    ->setValid($this->paystackService->verifyTransaction($ref));
+            case FlutterwaveUtility::NAME:
+                break;
+        }
+        return VerifyPaymentResponse::instance();
     }
 
     public function getPaymentModes(User $user): array

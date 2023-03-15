@@ -8,7 +8,6 @@ use App\Entities\Request\Payments\Paystack\PaystackMomoRequest;
 use App\Entities\Response\Payments\Paystack\PaystackResponse;
 use App\Models\User;
 use App\Utils\Payments\PaystackUtility;
-use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Http;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
@@ -50,5 +49,12 @@ class PaystackService extends PaystackConfig implements IPaystackService
         } catch (Throwable) {
         }
         return $responseType;
+    }
+
+    public function verifyTransaction(string $ref): bool
+    {
+        $response = $this->call(PayStackUtility::VERIFY_TRANSACTION_ENDPOINT. $ref);
+
+        return $response->status && $response->hasSuccessfulStatus();
     }
 }

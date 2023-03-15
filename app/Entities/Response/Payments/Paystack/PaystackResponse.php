@@ -34,6 +34,11 @@ class PaystackResponse implements ShouldTransform
         return $this;
     }
 
+    public function hasSuccessfulStatus(): bool
+    {
+        return $this->data['status'] === PaystackUtility::STATUS_SUCCESS;
+    }
+
     /**
      * @param string $message
      * @return PaystackResponse

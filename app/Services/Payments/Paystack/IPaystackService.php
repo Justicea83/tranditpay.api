@@ -12,4 +12,6 @@ interface IPaystackService
     public function initializePayment(PaystackCardRequest $request): PaystackResponse;
 
     public function momoPay(User $user, PaystackMomoRequest $request): ?PaystackResponse;
+
+    public function verifyTransaction(string $ref): bool;
 }

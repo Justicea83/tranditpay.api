@@ -10,4 +10,6 @@ class StatusUtils
     const PENDING = 'pending';
     const REJECTED = 'rejected';
     const COMPLETED = 'completed';
+    const FAILED = 'failed';
+    const REFUNDED = 'refunded';
 }

@@ -11,7 +11,7 @@ interface IPaymentService
 {
     public function collect(array $data, User $user, PaymentApi $paymentApi, ?float $amount = null, ?string $reference = null, ?string $currency = null): PaymentResponse;
 
-    public function verifyTransaction(User $user, string $ref): VerifyPaymentResponse;
+    public function verifyTransaction(string $provider, string $ref): VerifyPaymentResponse;
 
     public function getPaymentModes(User $user): array;
 

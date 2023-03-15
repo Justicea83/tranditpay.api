@@ -6,7 +6,9 @@ abstract class PendingPaymentAction
 {
     public string $provider;
     public string $method;
+    public string $currency;
     public float $amount;
+    public float $taxAmount;
     public int $merchantId;
 
     /**
@@ -46,6 +48,26 @@ abstract class PendingPaymentAction
     public function setMethod(string $method): PendingPaymentAction
     {
         $this->method = $method;
+        return $this;
+    }
+
+    /**
+     * @param float $taxAmount
+     * @return PendingPaymentAction
+     */
+    public function setTaxAmount(float $taxAmount): PendingPaymentAction
+    {
+        $this->taxAmount = $taxAmount;
+        return $this;
+    }
+
+    /**
+     * @param string $currency
+     * @return PendingPaymentAction
+     */
+    public function setCurrency(string $currency): PendingPaymentAction
+    {
+        $this->currency = $currency;
         return $this;
     }
 }

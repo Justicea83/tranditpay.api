@@ -10,4 +10,6 @@ interface ITransactionService
     public function processPayment(User $user, int $merchantId, array $payload);
 
     public function createPendingAction(User $user, array $payload): PaymentResponse;
+
+    public function processPendingRequests();
 }
