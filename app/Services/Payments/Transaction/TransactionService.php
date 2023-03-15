@@ -116,52 +116,61 @@ class TransactionService implements ITransactionService
 
     private function processPendingRequest(PendingRequest $pendingRequest)
     {
-        switch ($pendingRequest->type) {
-            case PendingAction::TYPE_FROM_FORM:
-                /** @var PendingPayFromForm $payload */
-                $payload = unserialize($pendingRequest->payload);
+        try {
+            DB::beginTransaction();
 
-                if (
-                    $this->paymentService->verifyTransaction($payload->provider, $pendingRequest->reference)->valid
-                ) {
-                    Transaction::builder()
-                        ->setReference($pendingRequest->reference)
-                        ->setTaxAmount($payload->taxAmount)
-                        ->setAmount($payload->amount)
-                        ->setFundsLocation(FundsLocation::Application->value)
-                        ->setStatus(TransactionStatus::Completed->value)
-                        ->setMerchantId($payload->merchantId)
-                        ->setUserId($pendingRequest->owner_id)
-                        ->setPaymentMethod($payload->method)
-                        ->setCurrency($payload->currency)
-                        ->create();
+            switch ($pendingRequest->type) {
+                case PendingAction::TYPE_FROM_FORM:
+                    /** @var PendingPayFromForm $payload */
+                    $payload = unserialize($pendingRequest->payload);
 
-                    if ($payload->responses) {
-                        $firstResponse = $payload->responses[0]['form_field_id'];
-                        /** @var FormField $formField */
-                        $formField = $this->formField->query()->find($firstResponse);
+                    if (
+                        $this->paymentService->verifyTransaction($payload->provider, $pendingRequest->reference)->valid
+                    ) {
+                        Transaction::builder()
+                            ->setReference($pendingRequest->reference)
+                            ->setTaxAmount($payload->taxAmount)
+                            ->setAmount($payload->amount)
+                            ->setFundsLocation(FundsLocation::Application->value)
+                            ->setStatus(TransactionStatus::Completed->value)
+                            ->setMerchantId($payload->merchantId)
+                            ->setUserId($pendingRequest->owner_id)
+                            ->setPaymentMethod($payload->method)
+                            ->setCurrency($payload->currency)
+                            ->create();
 
-                        if ($formField) {
-                            /** @var FormResponse $formResponse */
-                            $formResponse = $this->formResponse->query()->create([
-                                'form_id' => $formField->formSection->form->id,
-                                'reference' => $pendingRequest->reference,
-                                'user_id' => $pendingRequest->owner_id
-                            ]);
+                        if ($payload->responses) {
+                            $firstResponse = $payload->responses[0]['form_field_id'];
+                            /** @var FormField $formField */
+                            $formField = $this->formField->query()->find($firstResponse);
 
-                            foreach ($payload->responses as $response) {
-                                $formResponse->fieldResponses()->create([
-                                    'form_field_id' => $response['form_field_id'],
-                                    'response' => $response['value']
+                            if ($formField) {
+                                /** @var FormResponse $formResponse */
+                                $formResponse = $this->formResponse->query()->create([
+                                    'form_id' => $formField->formSection->form->id,
+                                    'reference' => $pendingRequest->reference,
+                                    'user_id' => $pendingRequest->owner_id
                                 ]);
+
+                                foreach ($payload->responses as $response) {
+                                    $formResponse->fieldResponses()->create([
+                                        'form_field_id' => $response['form_field_id'],
+                                        'response' => $response['value']
+                                    ]);
+                                }
                             }
                         }
-                    }
 
-                    $pendingRequest->status = StatusUtils::COMPLETED;
-                    $pendingRequest->save();
-                }
-                break;
+                        $pendingRequest->status = StatusUtils::COMPLETED;
+                        $pendingRequest->save();
+                    }
+                    break;
+            }
+            DB::commit();
+        } catch (Throwable $t) {
+            DB::rollBack();
+            throw $t;
         }
+
     }
 }
