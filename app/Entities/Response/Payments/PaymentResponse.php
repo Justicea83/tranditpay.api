@@ -5,13 +5,12 @@ namespace App\Entities\Response\Payments;
 class PaymentResponse
 {
     public int $code = 0;
-    public array $payment_info;
+    private array $payment_info;
     public string $reference;
     public string $provider;
     public string $email;
-    public bool $process = false;
+    public bool $processed = false;
     public string|null $message = null;
-    public array $data;
 
     public static function instance() : PaymentResponse{
         return new PaymentResponse();
@@ -58,12 +57,12 @@ class PaymentResponse
     }
 
     /**
-     * @param bool $process
+     * @param bool $processed
      * @return PaymentResponse
      */
-    public function setProcess(bool $process): PaymentResponse
+    public function setProcessed(bool $processed): PaymentResponse
     {
-        $this->process = $process;
+        $this->processed = $processed;
         return $this;
     }
 
@@ -88,12 +87,10 @@ class PaymentResponse
     }
 
     /**
-     * @param array $data
-     * @return PaymentResponse
+     * @return array
      */
-    public function setData(array $data): PaymentResponse
+    public function getPaymentInfo(): array
     {
-        $this->data = $data;
-        return $this;
+        return $this->payment_info;
     }
 }

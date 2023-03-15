@@ -8,16 +8,17 @@ class PaystackRequest
     public string $email;
     public string $currency;
     public string $reference;
-    public array $metadata = [];
+    public array $metadata;
     public float $transaction_charge;
 
     /**
+     * The amount should be in pesewas
      * @param mixed $amount
      * @return PaystackRequest
      */
     public function setAmount(float $amount): PaystackRequest
     {
-        $this->amount = $amount;
+        $this->amount = $amount * 100;
         return $this;
     }
 
