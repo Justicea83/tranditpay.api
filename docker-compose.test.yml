@@ -80,17 +80,6 @@ services:
         expose:
             - "9000"
 
-    composer:
-      image: composer:latest
-      container_name: composer
-      volumes:
-        - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}${APP_CODE_CONTAINER_FLAG}
-      working_dir: /var/www
-      depends_on:
-        - php-fpm
-      networks:
-        - sail
-
 networks:
     sail:
         driver: bridge
