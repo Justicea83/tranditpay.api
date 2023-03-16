@@ -13,7 +13,7 @@ return new class extends Migration {
     {
         Schema::create('payment_apis', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->string('name')->unique();
             $table->string('status')->default(StatusUtils::DISABLED);
             $table->json('extra_data')->nullable();
             $table->timestamps();

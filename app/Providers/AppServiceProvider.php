@@ -8,6 +8,12 @@ use App\Services\Collection\CollectionService;
 use App\Services\Collection\ICollectionService;
 use App\Services\Merchant\IMerchantService;
 use App\Services\Merchant\MerchantService;
+use App\Services\Payments\IPaymentService;
+use App\Services\Payments\PaymentService;
+use App\Services\Payments\Paystack\IPaystackService;
+use App\Services\Payments\Paystack\PaystackService;
+use App\Services\Payments\Transaction\ITransactionService;
+use App\Services\Payments\Transaction\TransactionService;
 use App\Services\Settlements\ISettlementService;
 use App\Services\Settlements\SettlementService;
 use App\Services\UserManagement\IUserManagementService;
@@ -26,6 +32,9 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(IUserManagementService::class, UserManagementService::class);
         $this->app->singleton(IMerchantService::class, MerchantService::class);
         $this->app->singleton(ISettlementService::class, SettlementService::class);
+        $this->app->singleton(ITransactionService::class, TransactionService::class);
+        $this->app->singleton(IPaymentService::class, PaymentService::class);
+        $this->app->singleton(IPaystackService::class, PaystackService::class);
     }
 
     /**
