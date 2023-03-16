@@ -42,4 +42,8 @@ class MerchantsController extends Controller
     {
         return $this->successResponse($this->merchantService->getPaymentModes(request()->user()));
     }
+
+    public function pay( int $merchantId){
+
+    }
 }

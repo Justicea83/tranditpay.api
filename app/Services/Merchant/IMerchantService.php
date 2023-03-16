@@ -20,4 +20,6 @@ interface IMerchantService
     public function getForm(User $user, int $merchantId, int $paymentTypeId): array;
 
     public function getPaymentModes(User $user): Collection;
+
+    public function pay(User $user, int $merchantId, array $payload);
 }
