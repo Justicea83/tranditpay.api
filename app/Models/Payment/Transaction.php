@@ -6,6 +6,12 @@ use App\Entities\Payments\Transactions\TransactionMap;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @property mixed|string $funds_location
+ * @property mixed|string $status
+ * @property mixed $payment_method
+ * @property Carbon|mixed $created_at
+ */
 class Transaction extends Model
 {
     use HasFactory;
