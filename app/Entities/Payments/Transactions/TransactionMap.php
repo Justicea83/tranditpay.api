@@ -15,8 +15,8 @@ class TransactionMap
     public string $payment_method;
     public string $currency;
     public string $reference;
-    public ?int $model_type;
-    public ?string $model_id;
+    public ?string $model_type;
+    public ?int $model_id;
 
     /**
      * @param float $amount
@@ -121,20 +121,20 @@ class TransactionMap
     }
 
     /**
-     * @param int|null $model_type
+     * @param string|null $model_type
      * @return TransactionMap
      */
-    public function setModelType(?int $model_type): TransactionMap
+    public function setModelType(?string $model_type): TransactionMap
     {
         $this->model_type = $model_type;
         return $this;
     }
 
     /**
-     * @param string|null $model_id
+     * @param int|null $model_id
      * @return TransactionMap
      */
-    public function setModelId(?string $model_id): TransactionMap
+    public function setModelId(?int $model_id): TransactionMap
     {
         $this->model_id = $model_id;
         return $this;

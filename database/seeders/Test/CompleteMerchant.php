@@ -28,10 +28,13 @@ class CompleteMerchant extends Seeder
 
         // add a few transactions
         $transaction = Transaction::query()->first();
-        for($i = 0; $i < 1000; $i++) {
+        for($i = 0; $i < 1; $i++) {
             if($transaction) {
+                $amount = random_int(100, 3000);
                 /** @var Transaction $newTransaction */
                 $newTransaction = $transaction->replicate();
+                $newTransaction->amount = $amount;
+                $newTransaction->tax_amount = $amount * 0.05;
                 $newTransaction->funds_location = FundsLocation::cases()[random_int(0,1)]->value;
                 $newTransaction->status = TransactionStatus::cases()[random_int(0,3)]->value;
                 $newTransaction->payment_method = PaymentMode::query()->pluck('name')->toArray()[random_int(0,1)];
