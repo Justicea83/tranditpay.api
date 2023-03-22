@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Merchant\Merchant;
 use Database\Seeders\Test\CompleteMerchant;
 use Illuminate\Database\Seeder;
 
@@ -24,6 +25,9 @@ class DatabaseSeeder extends Seeder
 
         if (app()->environment(['local'])) {
             $this->call(CompleteMerchant::class);
+            Merchant::factory()
+                ->count(400)
+                ->create();
         }
 
 
