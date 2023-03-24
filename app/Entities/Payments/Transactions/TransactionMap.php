@@ -15,6 +15,8 @@ class TransactionMap
     public string $payment_method;
     public string $currency;
     public string $reference;
+    public ?string $model_type;
+    public ?int $model_id;
 
     /**
      * @param float $amount
@@ -116,5 +118,25 @@ class TransactionMap
         /** @var Transaction $transaction */
         $transaction = Transaction::query()->create((array)$this);
         return $transaction;
+    }
+
+    /**
+     * @param string|null $model_type
+     * @return TransactionMap
+     */
+    public function setModelType(?string $model_type): TransactionMap
+    {
+        $this->model_type = $model_type;
+        return $this;
+    }
+
+    /**
+     * @param int|null $model_id
+     * @return TransactionMap
+     */
+    public function setModelId(?int $model_id): TransactionMap
+    {
+        $this->model_id = $model_id;
+        return $this;
     }
 }

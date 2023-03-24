@@ -9,6 +9,7 @@ use App\Models\Form\FormField;
 use App\Models\Form\FormResponse;
 use App\Models\Merchant\Merchant;
 use App\Models\Payment\PaymentApi;
+use App\Models\Payment\PaymentType;
 use App\Models\Payment\PendingRequest;
 use App\Models\Payment\Transaction;
 use App\Models\User;
@@ -135,6 +136,8 @@ class TransactionService implements ITransactionService
                             ->setStatus(TransactionStatus::Completed->value)
                             ->setMerchantId($payload->merchantId)
                             ->setUserId($pendingRequest->owner_id)
+                            ->setModelId($payload->payment_type_id)
+                            ->setModelType(PaymentType::class)
                             ->setPaymentMethod($payload->method)
                             ->setCurrency($payload->currency)
                             ->create();
