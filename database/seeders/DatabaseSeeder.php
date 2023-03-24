@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use App\Models\Merchant\Merchant;
 use Database\Seeders\Test\CompleteMerchant;
 use Illuminate\Database\Seeder;

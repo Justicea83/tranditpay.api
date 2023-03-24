@@ -20,7 +20,7 @@ return new class extends Migration
             $table->foreignId('country_id')->nullable()->constrained();
             $table->boolean('blocked')->default(false);
             $table->dateTime('suspended_until')->nullable();
-            $table->foreignId('owner_id')->constrained('users');
+            $table->foreignId('owner_id')->nullable()->constrained('users');
             $table->string('domain')->nullable();
             $table->foreignId('state_id')->nullable()->constrained();
             $table->timestamp('primary_email_verified_at')->nullable();
