@@ -12,7 +12,6 @@ use App\Models\Payment\PaymentApi;
 use App\Models\Payment\PaymentMode;
 use App\Models\Payment\PaymentType;
 use App\Models\Payment\PendingRequest;
-use App\Models\Payment\Tax;
 use App\Models\Payment\Transaction;
 use App\Models\User;
 use App\Services\Payments\IPaymentService;
@@ -34,7 +33,6 @@ class TransactionService implements ITransactionService
         private readonly PendingRequest  $pendingRequest,
         private readonly FormResponse    $formResponse,
         private readonly FormField       $formField,
-        private readonly Tax             $tax,
         private readonly PaymentMode     $paymentMode
     )
     {
