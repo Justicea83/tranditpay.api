@@ -111,6 +111,7 @@ class MerchantService implements IMerchantService
         $pagedData = $this->paymentTypeModel
             ->search($search)
             ->where('merchant_id', $merchantId)
+            ->where('status', StatusUtils::ACTIVE)
             ->paginate($pageSize, 'page', $page);
 
         $pagedData->getCollection()->transform(function (PaymentType $paymentType) {
