@@ -9,6 +9,7 @@ use App\Models\Payment\PaymentType;
 use App\Models\Payment\SettlementBank;
 use App\Models\Payment\Tax;
 use App\Models\Payment\Transaction;
+use App\Models\User;
 use Illuminate\Console\Command;
 
 class ImportAllScoutModels extends Command
@@ -40,6 +41,7 @@ class ImportAllScoutModels extends Command
             Form::class,
             Merchant::class,
             Tax::class,
+            User::class
         ];
         foreach( $classes as $class ){
             $this->call('scout:import', [
