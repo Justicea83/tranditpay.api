@@ -4,6 +4,7 @@ namespace App\Models\Payment;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Scout\Searchable;
 
 /**
  * @property mixed $account_number
@@ -12,7 +13,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class SettlementBank extends Model
 {
-    use HasFactory;
+    use HasFactory, Searchable;
 
     protected $fillable = [
         'merchant_id',

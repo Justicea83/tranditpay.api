@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Collection;
+use Laravel\Scout\Searchable;
 
 /**
  * @property Collection $sections
@@ -16,7 +17,7 @@ use Illuminate\Support\Collection;
  */
 class Form extends Model
 {
-    use HasFactory;
+    use HasFactory, Searchable;
 
     public function paymentType(): BelongsTo
     {
