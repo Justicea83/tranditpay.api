@@ -12,6 +12,7 @@ Route::prefix('v1/auth')->group(function (){
     Route::post('send-otp',[AuthController::class,'sendOtp'])->middleware('throttle:otp');
     Route::post('verify-otp',[AuthController::class,'verifyOtp']);
     Route::post('login-with-otp',[AuthController::class,'loginWithOtp']);
+    Route::post('register-with-otp',[AuthController::class,'registerWithOtp']);
     //
     Route::middleware('auth:api')->group(function () {
         Route::post('mobile-logout',[AuthController::class,'mobileLogout']);

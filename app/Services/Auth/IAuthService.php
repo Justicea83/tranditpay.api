@@ -30,7 +30,7 @@ interface IAuthService
 
     public function loginWithOtp(array $payload): array;
 
-    public function registerWithOtp(array $payload);
+    public function registerWithOtp(array $payload): array;
 
     public function pruneOtps();
 }

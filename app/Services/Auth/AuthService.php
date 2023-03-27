@@ -6,11 +6,14 @@ use App\Mail\Auth\ForgotPasswordMail;
 use App\Mail\Auth\NewUserPasswordChange;
 use App\Models\Auth\Otp;
 use App\Models\User;
+use App\Utils\AppUtils;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
 use JetBrains\PhpStorm\NoReturn;
 
 class AuthService implements IAuthService
@@ -191,15 +194,62 @@ class AuthService implements IAuthService
         if ($verified && $hasAccount) {
             /** @var User $user */
             $user = $this->userModel->query()->where('phone', $phone)->orWhere('email', $phone)->first();
+
+            if (!$user->phone_verified_at) {
+                $user->phone_verified_at = now()->toDateTimeString();
+                $user->save();
+            }
+
             $response['token'] = $user->createToken('Login')->accessToken;
         }
 
         return $response;
     }
 
-    public function registerWithOtp(array $payload)
+    public function registerWithOtp(array $payload): array
     {
-        // TODO: Implement registerWithOtp() method.
+        $response = [
+            'token' => null
+        ];
+
+        @[
+            'phone' => $phone,
+            'otp_code' => $otpCode,
+            'email' => $email,
+            'first_name' => $firstName,
+            'last_name' => $lastName
+        ] = $payload;
+
+        try {
+            /** @var User $user */
+            $user = $this->userModel->query()->create([
+                'phone' => $phone,
+                'email' => $email,
+                'first_name' => $firstName,
+                'last_name' => $lastName,
+                'password' => bcrypt(AppUtils::getToken(16)) // Set a random password which can be reset later
+            ]);
+        } catch (QueryException $exception) {
+            if (Str::contains($exception->getMessage(), 'Unique violation')) {
+                return $this->loginWithOtp($payload);
+            }
+        }
+
+
+        [
+            'verified' => $verified,
+        ] = $this->verifyOtp($phone, $otpCode);
+
+        // Only log the person in if the phone is verified
+        if ($verified) {
+            if (!$user->phone_verified_at) {
+                $user->phone_verified_at = now()->toDateTimeString();
+                $user->save();
+            }
+            $response['token'] = $user->createToken('Login')->accessToken;
+        }
+
+        return $response;
     }
 
     #[NoReturn] public function pruneOtps(): void

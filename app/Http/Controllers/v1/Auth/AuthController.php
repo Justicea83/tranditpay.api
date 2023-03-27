@@ -10,6 +10,7 @@ use App\Http\Requests\Auth\LoginWithRefreshTokenRequest;
 use App\Http\Requests\Auth\MobileLoginRequest;
 use App\Http\Requests\Auth\ResetPasswordRequest;
 use App\Http\Requests\Auth\SendOtpRequest;
+use App\Http\Requests\Auth\SignUpWithOtpRequest;
 use App\Http\Requests\Auth\VerifyOtpRequest;
 use App\Models\User;
 use App\Services\Auth\IAuthService;
@@ -94,6 +95,11 @@ class AuthController extends Controller
     public function loginWithOtp(LoginWithOtpRequest $request): JsonResponse
     {
         return $this->successResponse($this->authService->loginWithOtp($request->validated()));
+    }
+
+    public function registerWithOtp(SignUpWithOtpRequest $request): JsonResponse
+    {
+        return $this->successResponse($this->authService->registerWithOtp($request->validated()));
     }
 
     public function verifyOtp(VerifyOtpRequest $request): JsonResponse
