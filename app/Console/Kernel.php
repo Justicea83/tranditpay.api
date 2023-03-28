@@ -16,6 +16,7 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command(CreateSubAccountsCommand::class)->everyFiveMinutes()->withoutOverlapping()->runInBackground();
         $schedule->command(PruneOtps::class)->everyFiveMinutes()->withoutOverlapping()->runInBackground();
+        $schedule->command('passport:purge')->hourly();
         $schedule->command('queue:work --tries=3 --timeout=3000')->everyMinute()->withoutOverlapping();
     }
 
