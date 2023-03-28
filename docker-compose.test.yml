@@ -38,6 +38,7 @@ services:
             - sail
         ports:
             - "5050:5050"
+
     redis:
         image: 'redis:alpine'
         command: redis-server --appendonly yes --replica-read-only no
@@ -61,6 +62,7 @@ services:
         - sail
       ports:
         -   '8091:8001'
+
     nginx:
         build:
             context: "./docker/nginx"
