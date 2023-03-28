@@ -3,11 +3,15 @@
 namespace App\Http\Controllers\v1\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\ChangePasswordRequest;
 use App\Http\Requests\Auth\ForgotPasswordRequest;
+use App\Http\Requests\Auth\LoginWithOtpRequest;
+use App\Http\Requests\Auth\LoginWithRefreshTokenRequest;
 use App\Http\Requests\Auth\MobileLoginRequest;
 use App\Http\Requests\Auth\ResetPasswordRequest;
-use App\Http\Requests\ChangePasswordRequest;
-use App\Http\Requests\LoginWithRefreshTokenRequest;
+use App\Http\Requests\Auth\SendOtpRequest;
+use App\Http\Requests\Auth\SignUpWithOtpRequest;
+use App\Http\Requests\Auth\VerifyOtpRequest;
 use App\Models\User;
 use App\Services\Auth\IAuthService;
 use Illuminate\Http\JsonResponse;
@@ -23,6 +27,7 @@ class AuthController extends Controller
     {
         $this->authService = $authService;
     }
+
     //
 
     public function mobileLogin(MobileLoginRequest $request): JsonResponse
@@ -51,14 +56,14 @@ class AuthController extends Controller
 
     public function resetPassword(ResetPasswordRequest $request): JsonResponse
     {
-       // === Password::PASSWORD_RESET
+        // === Password::PASSWORD_RESET
         $status = $this->authService->resetPassword($request->all());
         switch ($status) {
             case Password::PASSWORD_RESET:
                 // Once password reset is successful, log the user out of all devices
                 /** @var User $user */
                 $user = User::query()->where('email', $request->get('email'))->first();
-                if($user) {
+                if ($user) {
                     $this->authService->logoutOfAllDevices($user);
                 }
                 return $this->successResponse('password changed successfully');
@@ -80,6 +85,26 @@ class AuthController extends Controller
     public function refreshToken(LoginWithRefreshTokenRequest $request): JsonResponse
     {
         return $this->successResponse($this->authService->loginWithRefreshToken($request->all()));
+    }
+
+    public function sendOtp(SendOtpRequest $request): JsonResponse
+    {
+        return $this->successResponse($this->authService->sendOtp($request->validated('phone')));
+    }
+
+    public function loginWithOtp(LoginWithOtpRequest $request): JsonResponse
+    {
+        return $this->successResponse($this->authService->loginWithOtp($request->validated()));
+    }
+
+    public function registerWithOtp(SignUpWithOtpRequest $request): JsonResponse
+    {
+        return $this->successResponse($this->authService->registerWithOtp($request->validated()));
+    }
+
+    public function verifyOtp(VerifyOtpRequest $request): JsonResponse
+    {
+        return $this->successResponse($this->authService->verifyOtp($request->validated('phone'), $request->validated('otp_code')));
     }
 
     public function changePassword(ChangePasswordRequest $request): Response

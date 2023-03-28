@@ -1,5 +1,6 @@
 <?php
 
+use App\Utils\StatusUtils;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -17,6 +18,7 @@ return new class extends Migration {
             $table->foreignId('payment_api_id')->nullable()->constrained();
             $table->foreignId('payment_mode_id')->nullable()->constrained();
             $table->string('name')->nullable();
+            $table->string('status')->default(StatusUtils::ACTIVE);
             $table->enum('rate_type', ['percentage', 'fixed'])->nullable(); // Percentage or fixed
             $table->double('rate_amount')->nullable();
             $table->timestamp('start_date')->nullable();

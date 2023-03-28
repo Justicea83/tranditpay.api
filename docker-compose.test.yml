@@ -46,6 +46,7 @@ services:
             - 'sail-redis:/data'
         networks:
             - sail
+            - shared
         healthcheck:
             test:
                 - CMD
@@ -53,7 +54,12 @@ services:
                 - ping
             retries: 3
             timeout: 5s
-
+    redisinsight:
+      image: redislabs/redisinsight:latest
+      networks:
+        - sail
+      ports:
+        -   '8091:8001'
     nginx:
         build:
             context: "./docker/nginx"

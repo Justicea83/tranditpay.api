@@ -9,6 +9,7 @@ use App\Models\Form\FormField;
 use App\Models\Form\FormResponse;
 use App\Models\Merchant\Merchant;
 use App\Models\Payment\PaymentApi;
+use App\Models\Payment\PaymentMode;
 use App\Models\Payment\PaymentType;
 use App\Models\Payment\PendingRequest;
 use App\Models\Payment\Transaction;
@@ -25,29 +26,28 @@ use Throwable;
 
 class TransactionService implements ITransactionService
 {
-    private PaymentApi $paymentApi;
-    private IPaymentService $paymentService;
-    private Merchant $merchant;
-    private PendingRequest $pendingRequest;
-    private FormResponse $formResponse;
-    private FormField $formField;
-
     public function __construct(
-        PaymentApi   $paymentApi, IPaymentService $paymentService, Merchant $merchant, PendingRequest $pendingRequest,
-        FormResponse $formResponse, FormField $formField
+        private readonly PaymentApi      $paymentApi,
+        private readonly IPaymentService $paymentService,
+        private readonly Merchant        $merchant,
+        private readonly PendingRequest  $pendingRequest,
+        private readonly FormResponse    $formResponse,
+        private readonly FormField       $formField,
+        private readonly PaymentMode     $paymentMode
     )
     {
-        $this->paymentApi = $paymentApi;
-        $this->paymentService = $paymentService;
-        $this->merchant = $merchant;
-        $this->pendingRequest = $pendingRequest;
-        $this->formResponse = $formResponse;
-        $this->formField = $formField;
     }
 
     public function processPayment(User $user, int $merchantId, array $payload)
     {
         // TODO: Implement processPayment() method.
+    }
+
+    private function getActivePaymentApi(): PaymentApi
+    {
+        /** @var PaymentApi $activeProvider */
+        $activeProvider = $this->paymentApi->query()->active()->first();
+        return $activeProvider;
     }
 
     public function createPendingAction(User $user, array $payload): PaymentResponse
@@ -60,8 +60,7 @@ class TransactionService implements ITransactionService
             'merchant_id' => $merchantId,
         ] = $payload;
 
-        /** @var PaymentApi $activeProvider */
-        $activeProvider = $this->paymentApi->query()->active()->first();
+        $activePaymentProvider = $this->getActivePaymentApi();
 
         /** @var Merchant $merchant */
         $merchant = $this->merchant->query()->find($merchantId);
@@ -82,7 +81,7 @@ class TransactionService implements ITransactionService
                         ->setMerchantId($payload['merchant_id'])
                         ->setMethod($paymentInfo['method'])
                         ->setCurrency($merchant->country->currency)
-                        ->setProvider($activeProvider->name);
+                        ->setProvider($activePaymentProvider->name);
                     break;
                 default:
                     throw new InvalidArgumentException('Invalid type provided');
@@ -93,7 +92,7 @@ class TransactionService implements ITransactionService
                 'type' => PendingAction::TYPE_FROM_FORM
             ]);
 
-            $response = $this->paymentService->collect($paymentInfo, $user, $activeProvider, $amount + $taxAmount, $ref, $merchant->country->currency);
+            $response = $this->paymentService->collect($paymentInfo, $user, $activePaymentProvider, $amount + $taxAmount, $ref, $merchant->country->currency);
 
             DB::commit();
         } catch (Throwable $t) {
@@ -104,6 +103,9 @@ class TransactionService implements ITransactionService
         return $response;
     }
 
+    /**
+     * @throws Throwable
+     */
     public function processPendingRequests()
     {
         $this->pendingRequest->query()->where('status', StatusUtils::PENDING)
@@ -175,5 +177,46 @@ class TransactionService implements ITransactionService
             throw $t;
         }
 
+    }
+
+    public function getTransactionApplicableTax(User $user, array $payload): array
+    {
+        [
+            'merchant_id' => $merchantId,
+            'payment_method' => $paymentMethod
+        ] = $payload;
+
+        /** @var Merchant $merchant */
+        $merchant = $this->merchant->query()->find($merchantId);
+        $activePaymentProvider = $this->getActivePaymentApi();
+
+        /** @var PaymentMode $paymentMode */
+        $paymentMode = $this->paymentMode->query()->where('name', $paymentMethod)->first();
+
+        return DB::select(
+            "
+                SELECT id, name, rate_type, rate_amount
+                FROM taxes
+                WHERE (
+                    country_code = :country_code
+                     AND
+                    (payment_api_id = :payment_api_id OR payment_api_id is NULL)
+                    AND
+                    (payment_mode_id = :payment_mode_id OR payment_mode_id is NULL)
+                    AND
+                    (merchant_id = :merchant_id OR merchant_id is NULL)
+                    AND
+                    (start_date <= now() OR start_date is NULL)
+                    AND
+                    (end_date >= now() OR end_date is NULL)
+                )
+            ",
+            [
+                'country_code' => $merchant->country->iso2,
+                'payment_api_id' => $activePaymentProvider?->id,
+                'payment_mode_id' => $paymentMode?->id,
+                'merchant_id' => $merchantId
+            ]
+        );
     }
 }

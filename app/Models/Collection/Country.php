@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property mixed id
  * @property mixed code
  * @property mixed name
+ * @property mixed $iso2
  */
 class Country extends Model
 {

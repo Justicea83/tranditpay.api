@@ -38,6 +38,12 @@ services:
             - sail
         ports:
             - "5050:5050"
+    redisinsight:
+        image: redislabs/redisinsight:latest
+        networks:
+            - sail
+        ports:
+            - '8091:8001'
     redis:
         image: 'redis:alpine'
         ports:
