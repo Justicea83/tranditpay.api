@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\V1\Merchant\MerchantsController;
+use App\Http\Controllers\v1\Merchant\MerchantsController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1/merchants')->group(function () {

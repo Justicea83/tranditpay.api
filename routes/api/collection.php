@@ -1,5 +1,5 @@
 <?php
-use App\Http\Controllers\V1\Collection\CollectionsController;
+use App\Http\Controllers\v1\Collection\CollectionsController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1/collections')->group(function (){
