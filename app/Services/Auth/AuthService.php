@@ -31,8 +31,8 @@ class AuthService implements IAuthService
 
         $response = Http::asForm()->post('nginx/oauth/token', [
             'grant_type' => 'password',
-            'client_id' => config('env.auth.pa_client_id'),
-            'client_secret' => config('env.auth.pa_client_secret'),
+            'client_id' => config('env.auth.pg_client_id'),
+            'client_secret' => config('env.auth.pg_client_secret'),
             'username' => $data['email'],
             'password' => $data['password'],
             'scope' => '',

@@ -27,4 +27,11 @@ class TransactionsController extends Controller
             $this->transactionService->getTransactionApplicableTax($request->user(), $request->validated())
         );
     }
+
+    public function getTransactions(): JsonResponse
+    {
+        return $this->successResponse(
+            $this->transactionService->getTransactions(request()->user())
+        );
+    }
 }

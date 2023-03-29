@@ -2,6 +2,7 @@
 
 namespace App\Services\Payments\Transaction;
 
+use App\Dto\Payments\TransactionDto;
 use App\Entities\PendingRequests\PendingAction;
 use App\Entities\PendingRequests\PendingPayFromForm;
 use App\Entities\Response\Payments\PaymentResponse;
@@ -33,7 +34,8 @@ class TransactionService implements ITransactionService
         private readonly PendingRequest  $pendingRequest,
         private readonly FormResponse    $formResponse,
         private readonly FormField       $formField,
-        private readonly PaymentMode     $paymentMode
+        private readonly PaymentMode     $paymentMode,
+        private readonly Transaction     $transaction,
     )
     {
     }
@@ -218,5 +220,23 @@ class TransactionService implements ITransactionService
                 'merchant_id' => $merchantId
             ]
         );
+    }
+
+    public function getTransactions(User $user): \Illuminate\Contracts\Pagination\Paginator
+    {
+        $pageSize = request()->query->get('pageSize') ?? 20;
+        $page = request()->query->get('pageIndex') ?? 1;
+
+        $pagedData = $this->transaction
+            ->query()
+            ->where('user_id', $user->id)
+            ->orderBy('created_at', 'desc')
+            ->simplePaginate($pageSize, ['*'], 'page', $page);
+
+        $pagedData->getCollection()->transform(function (Transaction $transaction) {
+            return TransactionDto::map($transaction);
+        });
+
+        return $pagedData;
     }
 }

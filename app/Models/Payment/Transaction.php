@@ -3,8 +3,12 @@
 namespace App\Models\Payment;
 
 use App\Entities\Payments\Transactions\TransactionMap;
+use App\Models\Merchant\Merchant;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Support\Carbon;
 use Laravel\Scout\Searchable;
 
 /**
@@ -14,6 +18,11 @@ use Laravel\Scout\Searchable;
  * @property Carbon|mixed $created_at
  * @property int|mixed $amount
  * @property float|mixed $tax_amount
+ * @property mixed $id
+ * @property mixed $currency
+ * @property mixed $reference
+ * @property mixed $merchant
+ * @property mixed $model
  */
 class Transaction extends Model
 {
@@ -24,5 +33,15 @@ class Transaction extends Model
     public static function builder(): TransactionMap
     {
         return new TransactionMap();
+    }
+
+    public function model(): MorphTo
+    {
+        return $this->morphTo();
+    }
+
+    public function merchant(): BelongsTo
+    {
+        return $this->belongsTo(Merchant::class);
     }
 }
