@@ -15,6 +15,8 @@ interface IMerchantService
 
     public function getMerchants(User $user): LengthAwarePaginator;
 
+    public function getAllMerchants(User $user): Collection;
+
     public function getPaymentTypes(User $user, int $merchantId): LengthAwarePaginator;
 
     public function getForm(User $user, int $merchantId, int $paymentTypeId): array;

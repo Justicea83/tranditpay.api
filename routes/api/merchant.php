@@ -12,6 +12,7 @@ Route::prefix('v1/merchants')->group(function () {
     //authenticated routes
     Route::middleware('auth:api')->group(function () {
         Route::get('', [MerchantsController::class, 'getMerchants']);
+        Route::get('all', [MerchantsController::class, 'getAllMerchants']);
         Route::get('{id}/payment-types', [MerchantsController::class, 'getPaymentTypes']);
         Route::get('{id}/payment-types/{paymentTypeId}/form', [MerchantsController::class, 'getForm']);
         Route::get('payment-modes', [MerchantsController::class, 'getPaymentModes']);

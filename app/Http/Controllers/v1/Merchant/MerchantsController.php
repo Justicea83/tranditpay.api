@@ -28,6 +28,11 @@ class MerchantsController extends Controller
         return $this->successResponse($this->merchantService->getMerchants(request()->user()));
     }
 
+    public function getAllMerchants(): JsonResponse
+    {
+        return $this->successResponse($this->merchantService->getAllMerchants(request()->user()));
+    }
+
     public function getPaymentTypes(int $merchantId): JsonResponse
     {
         return $this->successResponse($this->merchantService->getPaymentTypes(request()->user(), $merchantId));
