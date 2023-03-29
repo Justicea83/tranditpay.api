@@ -15,7 +15,5 @@ interface IPaymentService
 
     public function getPaymentModes(User $user): array;
 
-    public function processPayStackWebhookEvents(array $data): PaymentResponse;
-
     public function submitOtp(array $data);
 }

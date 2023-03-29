@@ -9,6 +9,7 @@ use App\Entities\Response\Payments\Paystack\PaystackResponse;
 use App\Models\User;
 use App\Utils\Payments\PaystackUtility;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
@@ -33,15 +34,19 @@ class PaystackService extends PaystackConfig implements IPaystackService
     private function call(string $endpoint, array $payload = [], string $method = 'get'): PaystackResponse
     {
         $responseType = new PaystackResponse();
+        Log::info("----------------------PAYSTACK REQUEST -------------------", $payload);
 
         try {
+            /** @var \Illuminate\Http\Client\Response $response */
             $response = Http::baseUrl($this->baseUrl)
                 ->withToken($this->secretKey)
                 ->retry(3, 100)
                 ->$method($endpoint, $payload);
             $status = $response->status();
+            Log::info(get_class(), ['status' => $status, 'message' => $response->body()]);
             if ($status == Response::HTTP_OK) {
                 $response = $response->json();
+                Log::info(get_class(), $response);
                 return $responseType->setStatus($response['status'] ?? false)
                     ->setMessage($response['message'] ?? null)
                     ->setData($response['data'] ?? []);
@@ -53,7 +58,7 @@ class PaystackService extends PaystackConfig implements IPaystackService
 
     public function verifyTransaction(string $ref): bool
     {
-        $response = $this->call(PayStackUtility::VERIFY_TRANSACTION_ENDPOINT. $ref);
+        $response = $this->call(PayStackUtility::VERIFY_TRANSACTION_ENDPOINT . $ref);
 
         return $response->status && $response->hasSuccessfulStatus();
     }

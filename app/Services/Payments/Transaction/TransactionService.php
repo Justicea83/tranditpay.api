@@ -20,6 +20,7 @@ use App\Utils\AppUtils;
 use App\Utils\Payments\Enums\FundsLocation;
 use App\Utils\Payments\Enums\TransactionStatus;
 use App\Utils\StatusUtils;
+use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
@@ -119,7 +120,7 @@ class TransactionService implements ITransactionService
             });
     }
 
-    private function processPendingRequest(PendingRequest $pendingRequest)
+    public function processPendingRequest(PendingRequest $pendingRequest)
     {
         try {
             DB::beginTransaction();
@@ -173,6 +174,7 @@ class TransactionService implements ITransactionService
                     }
                     break;
             }
+
             DB::commit();
         } catch (Throwable $t) {
             DB::rollBack();
@@ -222,7 +224,7 @@ class TransactionService implements ITransactionService
         );
     }
 
-    public function getTransactions(User $user): \Illuminate\Contracts\Pagination\Paginator
+    public function getTransactions(User $user): Paginator
     {
         $pageSize = request()->query->get('pageSize') ?? 20;
         $page = request()->query->get('pageIndex') ?? 1;

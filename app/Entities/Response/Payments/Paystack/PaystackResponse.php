@@ -63,11 +63,11 @@ class PaystackResponse implements ShouldTransform
     {
         $response = PaymentResponse::instance()
             ->setEmail($user->email)
-            ->setMessage($this->message)
-            ->setPaymentInfo($this->data)
+            ->setMessage($this->message ?? '')
+            ->setPaymentInfo($this->data ?? [])
             ->setCode($this->isSuccessful() ? Response::HTTP_OK : Response::HTTP_BAD_REQUEST)
             ->setProvider(PayStackUtility::NAME)
-            ->setReference($this->data['reference'])
+            ->setReference($this->data['reference'] ?? '')
             ->setProcessed($this->data || $processed);
 
         if(in_array($this->data['status'], [PaystackUtility::PENDING_MESSAGE, PaystackUtility::STATUS_SENT_OTP, PaystackUtility::STATUS_PAY_OFFLINE])) {

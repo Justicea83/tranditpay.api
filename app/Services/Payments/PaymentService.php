@@ -34,14 +34,14 @@ class PaymentService implements IPaymentService
 
         $response = new PaymentResponse();
 
-        if (config('app.env') == 'local') {
+        /*if (config('app.env') == 'local') {
             $response->code = Response::HTTP_OK;
             $response->reference = $reference;
             $response->provider = PayStackUtility::NAME;
             $response->email = $user->email;
             $response->processed = false;
             return $response;
-        }
+        }*/
 
         switch ($paymentApi->name) {
             case PaystackUtility::NAME:
@@ -51,7 +51,7 @@ class PaymentService implements IPaymentService
                     'provider' => $provider,
                 ] = $data['mobile_money'];
                 if ($paymentMode === AppConstants::APP_PAYMENT_MODE_MOMO) {
-                    return $this->paystackService
+                    $response = $this->paystackService
                         ->momoPay(
                             $user,
                             PaystackMomoRequest::instance()->setProvider($provider)
@@ -60,8 +60,8 @@ class PaymentService implements IPaymentService
                                 ->setAmount($amount)
                                 ->setReference($reference)
                                 ->setCurrency($currency)
-                        )
-                        ->transformToPaymentResponse($user);
+                        );
+                    return $response->transformToPaymentResponse($user);
                 }
                 break;
             case FlutterwaveUtility::NAME:
@@ -92,11 +92,6 @@ class PaymentService implements IPaymentService
     public function getPaymentModes(User $user): array
     {
         // TODO: Implement getPaymentModes() method.
-    }
-
-    public function processPayStackWebhookEvents(array $data): PaymentResponse
-    {
-        // TODO: Implement processPayStackWebhookEvents() method.
     }
 
     public function submitOtp(array $data)
