@@ -22,6 +22,7 @@ use Laravel\Scout\Searchable;
  * @property mixed $website
  * @property mixed $address
  * @property mixed $id
+ * @property mixed $about
  */
 class Merchant extends Model
 {
@@ -37,6 +38,16 @@ class Merchant extends Model
     public function owner(): BelongsTo
     {
         return $this->belongsTo(User::class, 'owner_id');
+    }
+
+    public function toSearchableArray(): array
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'website' => $this->website,
+            'about' => $this->about,
+        ];
     }
 
     public function country(): BelongsTo

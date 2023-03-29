@@ -41,11 +41,11 @@ return [
     |
     */
 
-    //'queue' => env('SCOUT_QUEUE', false),
-    'queue' => [
+    'queue' => env('SCOUT_QUEUE', false),
+    /*'queue' => [
         'connection' => 'redis',
         'queue' => 'scout'
-    ],
+    ],*/
 
     /*
     |--------------------------------------------------------------------------

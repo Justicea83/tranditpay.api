@@ -26,7 +26,7 @@ interface IAuthService
 
     public function sendOtp(string $phone): array;
 
-    public function verifyOtp(string $phone, string $otp): array;
+    public function verifyOtp(string $phone, string $otp, bool $addToken = true): array;
 
     public function loginWithOtp(array $payload): array;
 
