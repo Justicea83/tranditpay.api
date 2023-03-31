@@ -10,6 +10,7 @@ class PaystackRequest
     public string $reference;
     public array $metadata;
     public float $transaction_charge;
+    public string $reason;
 
     /**
      * The amount should be in pesewas
@@ -75,6 +76,16 @@ class PaystackRequest
     public function setCurrency(string $currency): PaystackRequest
     {
         $this->currency = $currency;
+        return $this;
+    }
+
+    /**
+     * @param string $reason
+     * @return PaystackRequest
+     */
+    public function setReason(string $reason): PaystackRequest
+    {
+        $this->reason = $reason;
         return $this;
     }
 }

@@ -17,4 +17,7 @@ interface IPaymentService
     public function getPaymentModes(User $user): array;
 
     public function submitOtp(array $data);
+
+    public function settlePaystackTransfer(string $event, array $data);
+
 }

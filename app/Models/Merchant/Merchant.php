@@ -4,12 +4,14 @@ namespace App\Models\Merchant;
 
 use App\Models\Collection\Country;
 use App\Models\Payment\PaymentType;
+use App\Models\Payment\Settlement;
 use App\Models\Payment\SettlementBank;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Laravel\Scout\Searchable;
 
 /**
@@ -23,6 +25,7 @@ use Laravel\Scout\Searchable;
  * @property mixed $address
  * @property mixed $id
  * @property mixed $about
+ * @property SettlementBank $settlementBank
  */
 class Merchant extends Model
 {
@@ -60,8 +63,19 @@ class Merchant extends Model
         return $this->hasMany(PaymentType::class, 'merchant_id');
     }
 
-    public function settlementBanks(): HasMany{
+    public function settlementBanks(): HasMany
+    {
         return $this->hasMany(SettlementBank::class);
+    }
+
+    public function settlementBank(): HasOne
+    {
+        return $this->hasOne(SettlementBank::class);
+    }
+
+    public function settlements(): HasMany
+    {
+        return $this->hasMany(Settlement::class);
     }
 
 }

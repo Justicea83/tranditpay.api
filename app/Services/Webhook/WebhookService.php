@@ -3,13 +3,18 @@
 namespace App\Services\Webhook;
 
 use App\Models\Payment\PendingRequest;
+use App\Services\Payments\IPaymentService;
 use App\Services\Payments\Transaction\ITransactionService;
 use App\Utils\Payments\PaystackUtility;
 use App\Utils\StatusUtils;
 
 class WebhookService implements IWebhookService
 {
-    public function __construct(private readonly PendingRequest $pendingRequest, private readonly ITransactionService $transactionService)
+    public function __construct(
+        private readonly PendingRequest      $pendingRequest,
+        private readonly ITransactionService $transactionService,
+        private readonly IPaymentService     $paymentService
+    )
     {
     }
 
@@ -27,6 +32,10 @@ class WebhookService implements IWebhookService
                 ->where('reference', $data['reference'])->first();
 
             $this->transactionService->processPendingRequest($pendingRequest);
+        }
+
+        if (in_array($event, PaystackUtility::TRANSFER_EVENTS)) {
+            $this->paymentService->settlePaystackTransfer($event, $data);
         }
 
     }

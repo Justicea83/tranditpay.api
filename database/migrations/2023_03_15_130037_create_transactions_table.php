@@ -23,6 +23,7 @@ return new class extends Migration {
             $table->string('payment_method')->nullable();
             $table->string('currency');
             $table->string('reference');
+            $table->foreignId('network_id')->nullable()->constrained('payment_apis');
             $table->unsignedBigInteger('model_id')->nullable();
             $table->string('model_type')->nullable();
             $table->timestamps();

@@ -23,4 +23,6 @@ interface ITransactionService
 
     public function processPendingRequest(PendingRequest $pendingRequest);
 
+    public function reimburseMerchants();
+
 }

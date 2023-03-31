@@ -8,10 +8,14 @@ use App\Entities\Response\Payments\PaymentResponse;
 use App\Entities\Response\Payments\VerifyPaymentResponse;
 use App\Models\Merchant\Merchant;
 use App\Models\Payment\PaymentApi;
+use App\Models\Payment\Settlement;
+use App\Models\Payment\Transaction;
 use App\Models\User;
 use App\Services\Payments\Flutterwave\IFlutterwaveService;
 use App\Services\Payments\Paystack\IPaystackService;
 use App\Utils\AppConstants;
+use App\Utils\Payments\Enums\FundsLocation;
+use App\Utils\Payments\Enums\TransactionStatus;
 use App\Utils\Payments\FlutterwaveUtility;
 use App\Utils\Payments\PaystackUtility;
 
@@ -21,7 +25,9 @@ class PaymentService implements IPaymentService
     function __construct
     (
         private readonly IPaystackService    $paystackService,
-        private readonly IFlutterwaveService $flutterwaveService
+        private readonly IFlutterwaveService $flutterwaveService,
+        private readonly Transaction $transaction,
+        private readonly Settlement $settlement
     )
     {
     }
@@ -116,4 +122,40 @@ class PaymentService implements IPaymentService
     {
         // TODO: Implement submitOtp() method.
     }
+
+    public function settlePaystackTransfer(string $event, array $data)
+    {
+        ['reason' => $reason, 'reference' => $reference] = $data;
+        $transactionReference = explode('/', $reason)[0];
+
+        /** @var Transaction $transaction */
+        $transaction = $this->transaction->query()->where('reference', $transactionReference)->first();
+
+        if (!$transaction) {
+            return;
+        }
+
+        $status = TransactionStatus::Completed->value;
+
+        if ($event === PaystackUtility::EVENT_TRANSFER_FAILED) {
+            $status = TransactionStatus::Failed->value;
+        }
+
+        if ($event === PaystackUtility::EVENT_TRANSFER_REVERSED) {
+            $status = TransactionStatus::Refunded->value;
+        }
+
+        /** @var Settlement $settlement */
+        $settlement = $this->settlement->query()->firstOrCreate([
+            'reference' => $reference,
+            'transaction_id' => $transaction->id,
+            'merchant_id' => $transaction->merchant_id,
+        ]);
+
+        $settlement->status = $status;
+        $settlement->save();
+
+        $transaction->funds_location = FundsLocation::Merchant->value;
+    }
+
 }

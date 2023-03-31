@@ -6,10 +6,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * @property string $extra_info
+ * @property mixed|string $status
  */
-class Bank extends Model
+class Settlement extends Model
 {
     use HasFactory;
-    protected $fillable = ['name', 'type', 'country_id'];
+
+    protected $fillable = [
+        'reference', 'transaction_id', 'status', 'merchant_id'
+    ];
 }

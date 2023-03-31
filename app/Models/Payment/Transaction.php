@@ -21,14 +21,16 @@ use Laravel\Scout\Searchable;
  * @property mixed $id
  * @property mixed $currency
  * @property mixed $reference
- * @property mixed $merchant
+ * @property Merchant $merchant
  * @property mixed $model
+ * @property PaymentApi $network
+ * @property mixed $merchant_id
  */
 class Transaction extends Model
 {
     use HasFactory, Searchable;
 
-    protected $fillable = ['user_id', 'amount', 'tax_amount', 'merchant_id', 'status', 'funds_location', 'payment_method', 'currency', 'reference', 'model_id', 'model_type'];
+    protected $fillable = ['user_id', 'amount', 'tax_amount', 'merchant_id', 'status', 'funds_location', 'payment_method', 'currency', 'reference', 'model_id', 'model_type', 'network_id'];
 
     public static function builder(): TransactionMap
     {
@@ -43,5 +45,10 @@ class Transaction extends Model
     public function merchant(): BelongsTo
     {
         return $this->belongsTo(Merchant::class);
+    }
+
+    public function network(): BelongsTo
+    {
+        return $this->belongsTo(PaymentApi::class, 'network_id');
     }
 }
