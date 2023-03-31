@@ -2,8 +2,11 @@
 
 namespace App\Services\Payments\Transaction;
 
+use App\Dto\Payments\TransactionDto;
 use App\Entities\PendingRequests\PendingAction;
 use App\Entities\PendingRequests\PendingPayFromForm;
+use App\Entities\Request\Payments\Paystack\PaystackReceiptRequest;
+use App\Entities\Request\Payments\Paystack\PaystackTransferRequest;
 use App\Entities\Response\Payments\PaymentResponse;
 use App\Models\Form\FormField;
 use App\Models\Form\FormResponse;
@@ -15,10 +18,14 @@ use App\Models\Payment\PendingRequest;
 use App\Models\Payment\Transaction;
 use App\Models\User;
 use App\Services\Payments\IPaymentService;
+use App\Services\Payments\Paystack\IPaystackService;
 use App\Utils\AppUtils;
 use App\Utils\Payments\Enums\FundsLocation;
 use App\Utils\Payments\Enums\TransactionStatus;
+use App\Utils\Payments\PaystackUtility;
 use App\Utils\StatusUtils;
+use Illuminate\Contracts\Pagination\Paginator;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
@@ -27,13 +34,15 @@ use Throwable;
 class TransactionService implements ITransactionService
 {
     public function __construct(
-        private readonly PaymentApi      $paymentApi,
-        private readonly IPaymentService $paymentService,
-        private readonly Merchant        $merchant,
-        private readonly PendingRequest  $pendingRequest,
-        private readonly FormResponse    $formResponse,
-        private readonly FormField       $formField,
-        private readonly PaymentMode     $paymentMode
+        private readonly PaymentApi       $paymentApi,
+        private readonly IPaymentService  $paymentService,
+        private readonly Merchant         $merchant,
+        private readonly PendingRequest   $pendingRequest,
+        private readonly FormResponse     $formResponse,
+        private readonly FormField        $formField,
+        private readonly PaymentMode      $paymentMode,
+        private readonly Transaction      $transaction,
+        private readonly IPaystackService $paystackService
     )
     {
     }
@@ -92,7 +101,7 @@ class TransactionService implements ITransactionService
                 'type' => PendingAction::TYPE_FROM_FORM
             ]);
 
-            $response = $this->paymentService->collect($paymentInfo, $user, $activePaymentProvider, $amount + $taxAmount, $ref, $merchant->country->currency);
+            $response = $this->paymentService->collect($paymentInfo, $user, $activePaymentProvider, $merchant, $amount + $taxAmount, $ref);
 
             DB::commit();
         } catch (Throwable $t) {
@@ -117,7 +126,7 @@ class TransactionService implements ITransactionService
             });
     }
 
-    private function processPendingRequest(PendingRequest $pendingRequest)
+    public function processPendingRequest(PendingRequest $pendingRequest)
     {
         try {
             DB::beginTransaction();
@@ -171,6 +180,7 @@ class TransactionService implements ITransactionService
                     }
                     break;
             }
+
             DB::commit();
         } catch (Throwable $t) {
             DB::rollBack();
@@ -217,6 +227,111 @@ class TransactionService implements ITransactionService
                 'payment_mode_id' => $paymentMode?->id,
                 'merchant_id' => $merchantId
             ]
+        );
+    }
+
+    public function getTransactions(User $user): Paginator
+    {
+        $pageSize = request()->query->get('pageSize') ?? 20;
+        $page = request()->query->get('pageIndex') ?? 1;
+
+        $pagedData = $this->transaction
+            ->query()
+            ->where('user_id', $user->id)
+            ->orderBy('created_at', 'desc')
+            ->simplePaginate($pageSize, ['*'], 'page', $page);
+
+        $pagedData->getCollection()->transform(function (Transaction $transaction) {
+            return TransactionDto::map($transaction);
+        });
+
+        return $pagedData;
+    }
+
+    /**
+     * @throws Throwable
+     */
+    public function reimburseMerchants()
+    {
+        $this->transaction->query()->where('status', TransactionStatus::Completed->value)
+            ->where('funds_location', FundsLocation::Application->value)
+            ->chunkById(200, function (\Illuminate\Database\Eloquent\Collection $transactions) {
+                /** @var Transaction $transaction */
+                foreach ($transactions as $transaction) {
+                    $this->reimburseMerchant($transaction);
+                }
+            });
+    }
+
+    /**
+     * @throws Throwable
+     */
+    public function reimburseMerchant(Transaction $transaction)
+    {
+        $merchant = $transaction->merchant;
+        $settlementBank = $merchant->settlementBank;
+        $settlementBankData = $settlementBank->extra_data ? json_decode($settlementBank->extra_data, true) : [];
+        $network = $transaction->network;
+        $bank = $settlementBank->bank;
+
+        // Paystack was used to process this transaction
+        if ($network->name === PaystackUtility::NAME) {
+            $bankExtraInfo = $bank->extra_info ? json_decode($bank->extra_info, true) : null;
+
+            if (!$bankExtraInfo) {
+                // TODO alert merchant of missing info
+                return;
+            }
+            $key = sprintf('%s.%s.%s', PaystackUtility::NAME, 'transferReceipts', $settlementBank->account_number);
+            $bankSettlementInfo = $bankExtraInfo[PaystackUtility::NAME];
+
+            if (Arr::has($settlementBankData, $key)) {
+                $receiptCode = Arr::get($settlementBankData, sprintf('%s.%s', $key, 'recipient_code'));
+
+                $this->sendMoneyViaPaystackToMerchant($transaction, $receiptCode);
+            } else {
+                [
+                    'code' => $code,
+                    'type' => $type
+                ] = $bankSettlementInfo;
+
+                $receiptDetails = $this->paystackService->createTransferReceipt(
+                    PaystackReceiptRequest::instance()
+                        ->setName($merchant->name)
+                        ->setCurrency($transaction->currency)
+                        ->setAccountNumber($settlementBank->account_number)
+                        ->setType($type)
+                        ->setBankCode($code));
+
+                if ($receiptDetails->isSuccessful()) {
+                    $receiptCode = $receiptDetails->data['recipient_code'];
+                    Arr::set($settlementBankData, $key, [
+                        'recipient_code' => $receiptCode,
+                        'integration' => $receiptDetails->data['integration'],
+                        'id' => $receiptDetails->data['id'],
+                    ]);
+
+                    $settlementBank->extra_data = json_encode($settlementBankData);
+                    $settlementBank->save();
+                    $this->sendMoneyViaPaystackToMerchant($transaction, $receiptCode);
+                }
+            }
+
+        }
+    }
+
+    /**
+     * @throws Throwable
+     */
+    private function sendMoneyViaPaystackToMerchant(Transaction $transaction, string $receiptCode)
+    {
+        $this->paystackService->singleTransfer(
+            PaystackTransferRequest::instance()
+                ->setSource('balance')
+                ->setRecipient($receiptCode)
+                ->setAmount($transaction->amount)
+                ->setReference(uniqid() . time())
+                ->setReason(sprintf('%s/%s', $transaction->reference, 'REIMBURSEMENT'))
         );
     }
 }

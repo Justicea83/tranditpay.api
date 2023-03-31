@@ -31,8 +31,8 @@ class AuthService implements IAuthService
 
         $response = Http::asForm()->post('nginx/oauth/token', [
             'grant_type' => 'password',
-            'client_id' => config('env.auth.pa_client_id'),
-            'client_secret' => config('env.auth.pa_client_secret'),
+            'client_id' => config('env.auth.pg_client_id'),
+            'client_secret' => config('env.auth.pg_client_secret'),
             'username' => $data['email'],
             'password' => $data['password'],
             'scope' => '',
@@ -152,13 +152,14 @@ class AuthService implements IAuthService
         return $response;
     }
 
-    public function verifyOtp(string $phone, string $otp): array
+    public function verifyOtp(string $phone, string $otp, bool $addToken = true): array
     {
         /** @var Otp $otp */
         $otp = $this->otpModel->query()->where('otp_code', $otp)->where('phone', $phone)->latest()->first();
         $response = [
             'verified' => false,
-            'has_account' => false
+            'has_account' => false,
+            'token' => null
         ];
 
         if (!$otp) {
@@ -173,7 +174,24 @@ class AuthService implements IAuthService
             $response['has_account'] = true;
         }
 
+        if ($response['verified'] && $response['has_account'] && $addToken) {
+            $response['token'] = $this->getToken($phone);
+        }
+
         return $response;
+    }
+
+    private function getToken(string $phone): string
+    {
+        /** @var User $user */
+        $user = $this->userModel->query()->where('phone', $phone)->orWhere('email', $phone)->first();
+
+        if (!$user->phone_verified_at) {
+            $user->phone_verified_at = now()->toDateTimeString();
+            $user->save();
+        }
+
+        return $user->createToken('Login')->accessToken;
     }
 
     public function loginWithOtp(array $payload): array
@@ -185,22 +203,14 @@ class AuthService implements IAuthService
         [
             'verified' => $verified,
             'has_account' => $hasAccount
-        ] = $this->verifyOtp($phone, $otpCode);
+        ] = $this->verifyOtp($phone, $otpCode, false);
 
         $response = [
             'token' => null
         ];
 
         if ($verified && $hasAccount) {
-            /** @var User $user */
-            $user = $this->userModel->query()->where('phone', $phone)->orWhere('email', $phone)->first();
-
-            if (!$user->phone_verified_at) {
-                $user->phone_verified_at = now()->toDateTimeString();
-                $user->save();
-            }
-
-            $response['token'] = $user->createToken('Login')->accessToken;
+            $response['token'] = $this->getToken($phone);
         }
 
         return $response;

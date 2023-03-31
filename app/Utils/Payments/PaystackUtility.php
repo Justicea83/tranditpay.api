@@ -10,11 +10,14 @@ class PaystackUtility
     const TRANSACTION_ENDPOINT = '/transaction';
     const BANKS_ENDPOINT = '/bank';
     const CHARGE_ENDPOINT = '/charge';
-    const SUBMIT_OTP_ENDPOINT = self::CHARGE_ENDPOINT.'/submit_otp';
+    const SUBMIT_OTP_ENDPOINT = self::CHARGE_ENDPOINT . '/submit_otp';
     const REVERSAL_ENDPOINT = '/refund';
-    const TRANSACTION_TYPE = 'paystack_funding';
     const INIT_TRANSACTION_ENDPOINT = self::TRANSACTION_ENDPOINT . '/initialize';
     const VERIFY_TRANSACTION_ENDPOINT = self::TRANSACTION_ENDPOINT . '/verify/';
+    const TRANSFER_RECEIPT_ENDPOINT = '/transferrecipient';
+    const TRANSFER_ENDPOINT = '/transfer';
+
+    const TRANSACTION_TYPE = 'paystack_funding';
 
     const STATUS_PAY_OFFLINE = "pay_offline";
     const STATUS_SENT_OTP = "sent_otp";
@@ -24,6 +27,15 @@ class PaystackUtility
     const PENDING_MESSAGE = "Your transaction is being processed";
     const OFFLINE_MESSAGE = "Please enter your PIN";
     const EVENT_CHARGE_SUCCESS = "charge.success";
+    const EVENT_TRANSFER_SUCCESS = 'transfer.success';
+    const EVENT_TRANSFER_FAILED = 'transfer.failed';
+    const EVENT_TRANSFER_REVERSED = 'transfer.reversed';
+
+    const TRANSFER_EVENTS = [
+        self::EVENT_TRANSFER_SUCCESS,
+        self::EVENT_TRANSFER_FAILED,
+        self::EVENT_TRANSFER_REVERSED,
+    ];
     const DOMAIN_TEST = "test";
 
     //payment channels

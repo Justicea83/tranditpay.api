@@ -4,6 +4,7 @@ namespace App\Services\Collection;
 
 use App\Models\Collection\Country;
 use App\Models\Collection\State;
+use App\Services\Merchant\IMerchantService;
 use App\Utils\CacheKeys;
 use App\Utils\CollectionUtils;
 use Illuminate\Database\Eloquent\Model;
@@ -15,16 +16,12 @@ use Stevebauman\Location\Facades\Location;
 class CollectionService implements ICollectionService
 {
 
-    private Country $countryModel;
-    private State $stateModel;
-
     public function __construct(
-        Country $countryModel,
-        State   $stateModel
+        private readonly Country          $countryModel,
+        private readonly State            $stateModel,
+        private readonly IMerchantService $merchantService,
     )
     {
-        $this->countryModel = $countryModel;
-        $this->stateModel = $stateModel;
     }
 
 
@@ -35,6 +32,11 @@ class CollectionService implements ICollectionService
                 return $this->loadCountries();
             case CollectionUtils::COLLECTION_TYPE_LOCATION:
                 return $this->loadLocation();
+            case CollectionUtils::COLLECTION_TYPE_MERCHANTS:
+                return $this->merchantService->getAllMerchants(null);
+            case CollectionUtils::COLLECTION_TYPE_MERCHANTS_PAYMENT_TYPES:
+                ['type_id' => $typeId] = $payload;
+                return $this->merchantService->getAllPaymentTypes(null, $typeId);
             case CollectionUtils::COLLECTION_TYPE_COUNTRIES_STATES:
                 ['type_id' => $typeId] = $payload;
                 return $this->loadCountryStates($typeId);

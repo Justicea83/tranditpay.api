@@ -19,6 +19,8 @@ class PaymentType extends Model
 {
     use HasFactory, Searchable;
 
+    protected $fillable = ['name', 'merchant_id'];
+
     public function merchant(): BelongsTo
     {
         return $this->belongsTo(Merchant::class);

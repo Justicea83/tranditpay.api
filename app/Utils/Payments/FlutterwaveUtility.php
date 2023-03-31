@@ -6,10 +6,13 @@ class FlutterwaveUtility
 {
     const NAME = "flutterwave";
     const SUCCESS_RESPONSE = 'success';
+    const FAIL_RESPONSE = 'fail';
+
+    const VERSION = '/v3/';
 
     const TRANSACTION_TYPE_CARD = 'CARD_TRANSACTION'; //CARD_TRANSACTION
 
-    const ENDPOINT_CHARGES = 'charges';
+    const ENDPOINT_CHARGES = self::VERSION . 'charges';
     const ENDPOINT_VALIDATE_CHARGE = 'validate-charge';
     const ENDPOINT_BANKS = 'banks';
 

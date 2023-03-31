@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\V1\UserManagement\UserManagementController;
+use App\Http\Controllers\v1\UserManagement\UserManagementController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1/user-mgmt')->group(function () {

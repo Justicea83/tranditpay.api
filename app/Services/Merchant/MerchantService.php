@@ -191,4 +191,27 @@ class MerchantService implements IMerchantService
         // TODO,  Save the form response
         $this->transactionService->processPayment($user, $merchantId, $payload);
     }
+
+    public function getAllMerchants(?User $user): Collection
+    {
+        return $this->merchantModel->query()
+            ->where('status', StatusUtils::ACTIVE)
+            ->get()
+            ->map(function (Merchant $merchant) {
+                return MerchantDto::map($merchant);
+            });
+    }
+
+    public function getAllPaymentTypes(?User $user, int $merchantId): Collection
+    {
+        return $this->paymentTypeModel->query()
+            ->where('merchant_id', $merchantId)
+            ->where('status', StatusUtils::ACTIVE)
+            ->get()->map(function (PaymentType $paymentType) {
+                return [
+                    'id' => $paymentType->id,
+                    'name' => $paymentType->name,
+                ];
+            });
+    }
 }

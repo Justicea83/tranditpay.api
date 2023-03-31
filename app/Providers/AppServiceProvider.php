@@ -8,6 +8,8 @@ use App\Services\Collection\CollectionService;
 use App\Services\Collection\ICollectionService;
 use App\Services\Merchant\IMerchantService;
 use App\Services\Merchant\MerchantService;
+use App\Services\Payments\Flutterwave\FlutterwaveService;
+use App\Services\Payments\Flutterwave\IFlutterwaveService;
 use App\Services\Payments\IPaymentService;
 use App\Services\Payments\PaymentService;
 use App\Services\Payments\Paystack\IPaystackService;
@@ -18,6 +20,8 @@ use App\Services\Settlements\ISettlementService;
 use App\Services\Settlements\SettlementService;
 use App\Services\UserManagement\IUserManagementService;
 use App\Services\UserManagement\UserManagementService;
+use App\Services\Webhook\IWebhookService;
+use App\Services\Webhook\WebhookService;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -35,6 +39,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(ITransactionService::class, TransactionService::class);
         $this->app->singleton(IPaymentService::class, PaymentService::class);
         $this->app->singleton(IPaystackService::class, PaystackService::class);
+        $this->app->singleton(IFlutterwaveService::class, FlutterwaveService::class);
+        $this->app->singleton(IWebhookService::class, WebhookService::class);
     }
 
     /**

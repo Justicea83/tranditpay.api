@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('name')->nullable();
             $table->string('status')->default(StatusUtils::ACTIVE);
             $table->foreignId('country_id')->constrained();
-            $table->string('type')->nullable();
+            $table->json('extra_info')->nullable();
             $table->timestamps();
         });
     }

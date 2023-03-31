@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Console\Commands;
+namespace App\Console\Commands\Payments;
 
 use App\Services\Payments\Transaction\ITransactionService;
 use Illuminate\Console\Command;

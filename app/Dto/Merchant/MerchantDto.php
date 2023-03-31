@@ -13,6 +13,7 @@ class MerchantDto extends BaseDto
     public ?string $website;
     public ?string $about;
     public ?string $address;
+    public ?string $currency;
     public ?array $socialMedia;
 
     /**
@@ -26,6 +27,7 @@ class MerchantDto extends BaseDto
         $instance->name = $model->name;
         $instance->website = $model->website;
         $instance->address = $model->address;
+        $instance->currency = $model->country?->currency;
         $instance->socialMedia = json_decode($model->extra_data['social_media'] ?? '{}',true);
 
         return $instance;

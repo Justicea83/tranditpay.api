@@ -6,6 +6,7 @@ class PaymentResponse
 {
     public int $code = 0;
     private array $payment_info;
+    public array $meta;
     public string $reference;
     public string $provider;
     public string $email;
@@ -92,5 +93,15 @@ class PaymentResponse
     public function getPaymentInfo(): array
     {
         return $this->payment_info;
+    }
+
+    /**
+     * @param array $meta
+     * @return PaymentResponse
+     */
+    public function setMeta(array $meta): PaymentResponse
+    {
+        $this->meta = $meta;
+        return $this;
     }
 }
