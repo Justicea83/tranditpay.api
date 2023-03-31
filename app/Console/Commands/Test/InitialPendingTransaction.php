@@ -78,12 +78,13 @@ class InitialPendingTransaction extends Command
         $payload = [
             'type' => PendingAction::TYPE_FROM_FORM,
             'amount' => $amount,
-            'tax' => $faker->randomFloat(null, 2, 40),
+            //'tax' => $faker->randomFloat(null, 2, 40),
+            'tax' => 0,
             'payment_info' => [
                 'method' => $paymentMethod,
                 $paymentMethod => [
                     'provider' => 'MTN',
-                    'phone' => $status === 'success' ? '0551234987' : $faker->phoneNumber
+                    'phone' => $status === 'success' ? '0243742088' : $faker->phoneNumber
                 ]
             ],
             'merchant_id' => $merchantId,

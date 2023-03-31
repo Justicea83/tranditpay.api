@@ -13,7 +13,6 @@ class FlutterwaveRequest
     public float $amount;
     public array $meta = [];
 
-
     public function setTransactionType($type): FlutterwaveRequest
     {
         $this->meta['transaction_type'] = $type;

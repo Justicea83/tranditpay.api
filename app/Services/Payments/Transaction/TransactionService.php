@@ -95,7 +95,7 @@ class TransactionService implements ITransactionService
                 'type' => PendingAction::TYPE_FROM_FORM
             ]);
 
-            $response = $this->paymentService->collect($paymentInfo, $user, $activePaymentProvider, $amount + $taxAmount, $ref, $merchant->country->currency);
+            $response = $this->paymentService->collect($paymentInfo, $user, $activePaymentProvider, $merchant, $amount + $taxAmount, $ref);
 
             DB::commit();
         } catch (Throwable $t) {

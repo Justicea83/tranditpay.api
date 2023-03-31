@@ -63,17 +63,22 @@ class FlutterwaveResponse
         return $this;
     }
 
-    public function transformToCollectionResponse(User $user, string $ref, bool $processed): PaymentResponse
+    public function transformToPaymentResponse(User $user, bool $processed = false): PaymentResponse
     {
-        return PaymentResponse::instance()
-            ->setEmail($user->email)
+        $response = PaymentResponse::instance();
+
+        if (!$this->isSuccessful()) {
+            return $response->setCode(Response::HTTP_BAD_REQUEST);
+        }
+
+        return $response->setEmail($user->email)
             ->setMessage($this->message)
-            ->setPaymentInfo($this->meta)
-            ->setCode($this->isSuccessful() ? Response::HTTP_OK : Response::HTTP_BAD_REQUEST)
+            ->setPaymentInfo($this->data)
+            ->setMeta($this->meta)
+            ->setCode(Response::HTTP_OK)
             ->setProvider(FlutterwaveUtility::NAME)
-            ->setReference($ref)
-            ->setData($this->data)
-            ->setProcess($this->data != null || $processed);
+            ->setReference($this->data['tx_ref'] ?? '')
+            ->setProcessed($this->data != null || $processed);
     }
 
     public function transformToValidateOtpResponse(): ValidateOtpResponse

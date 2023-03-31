@@ -61,19 +61,24 @@ class PaystackResponse implements ShouldTransform
 
     public function transformToPaymentResponse(User $user, bool $processed = false): PaymentResponse
     {
-        $response = PaymentResponse::instance()
-            ->setEmail($user->email)
+        $response = PaymentResponse::instance();
+
+        if (!$this->isSuccessful()) {
+            return $response->setCode(Response::HTTP_BAD_REQUEST);
+        }
+
+        $response = $response->setEmail($user->email)
             ->setMessage($this->message ?? '')
             ->setPaymentInfo($this->data ?? [])
-            ->setCode($this->isSuccessful() ? Response::HTTP_OK : Response::HTTP_BAD_REQUEST)
+            ->setCode(Response::HTTP_OK)
             ->setProvider(PayStackUtility::NAME)
             ->setReference($this->data['reference'] ?? '')
             ->setProcessed($this->data || $processed);
 
-        if(in_array($this->data['status'], [PaystackUtility::PENDING_MESSAGE, PaystackUtility::STATUS_SENT_OTP, PaystackUtility::STATUS_PAY_OFFLINE])) {
+        if (in_array($this->data['status'], [PaystackUtility::PENDING_MESSAGE, PaystackUtility::STATUS_SENT_OTP, PaystackUtility::STATUS_PAY_OFFLINE])) {
             $response = $response->setMessage(PayStackUtility::PENDING_MESSAGE)->setProcessed(false);
 
-            if($this->data['status'] === PaystackUtility::STATUS_PAY_OFFLINE) {
+            if ($this->data['status'] === PaystackUtility::STATUS_PAY_OFFLINE) {
                 $response = $response->setMessage(PaystackUtility::STATUS_PAY_OFFLINE);
             }
         }

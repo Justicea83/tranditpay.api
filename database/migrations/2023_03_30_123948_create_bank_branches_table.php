@@ -12,11 +12,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('banks', function (Blueprint $table) {
+        Schema::create('bank_branches', function (Blueprint $table) {
             $table->id();
             $table->string('name')->nullable();
             $table->string('status')->default(StatusUtils::ACTIVE);
-            $table->foreignId('country_id')->constrained();
+            $table->foreignId('bank_id')->nullable()->constrained();
             $table->json('extra_info')->nullable();
             $table->timestamps();
         });
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('banks');
+        Schema::dropIfExists('bank_branches');
     }
 };

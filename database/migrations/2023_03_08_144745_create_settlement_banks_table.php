@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('merchant_id')->constrained();
             $table->foreignId('settlement_mode_id')->constrained();
-            $table->string('bank_name');
+            $table->foreignId('bank_id')->nullable()->constrained();
+            $table->foreignId('bank_branch_id')->nullable()->constrained();
             $table->string('account_name')->nullable();
             $table->string('account_number'); // Phone number for mobile money
             $table->json('extra_data')->nullable();
