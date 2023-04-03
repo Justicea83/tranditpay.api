@@ -84,7 +84,7 @@ class MerchantService implements IMerchantService
         return $merchant;
     }
 
-    public function getMerchants(User $user): LengthAwarePaginator
+    public function getMerchants(?User $user): LengthAwarePaginator
     {
         $pageSize = request()->query->get('pageSize') ?? 20;
         $page = request()->query->get('pageIndex') ?? 1;
@@ -124,7 +124,7 @@ class MerchantService implements IMerchantService
         return $pagedData;
     }
 
-    public function getForm(User $user, int $merchantId, int $paymentTypeId): array
+    public function getForm(?User $user, int $merchantId, int $paymentTypeId): array
     {
         /** @var PaymentType $paymentType */
         $paymentType = $this->paymentTypeModel->query()->find($paymentTypeId);
@@ -163,7 +163,7 @@ class MerchantService implements IMerchantService
         ];
     }
 
-    public function getPaymentModes(User $user): Collection
+    public function getPaymentModes(?User $user): Collection
     {
         $cacheKey = CacheKeys::getKeyForUser($user, CacheKeys::USER_LOCATION);
 

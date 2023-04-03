@@ -25,27 +25,27 @@ class MerchantsController extends Controller
 
     public function getMerchants(): JsonResponse
     {
-        return $this->successResponse($this->merchantService->getMerchants(request()->user()));
+        return $this->successResponse($this->merchantService->getMerchants(request()->user() ?? null));
     }
 
     public function getAllMerchants(): JsonResponse
     {
-        return $this->successResponse($this->merchantService->getAllMerchants(request()->user()));
+        return $this->successResponse($this->merchantService->getAllMerchants(request()->user() ?? null));
     }
 
     public function getPaymentTypes(int $merchantId): JsonResponse
     {
-        return $this->successResponse($this->merchantService->getPaymentTypes(request()->user(), $merchantId));
+        return $this->successResponse($this->merchantService->getPaymentTypes(request()->user() ?? null, $merchantId));
     }
 
     public function getForm(int $merchantId, int $paymentTypeId): JsonResponse
     {
-        return $this->successResponse($this->merchantService->getForm(request()->user(), $merchantId, $paymentTypeId));
+        return $this->successResponse($this->merchantService->getForm(request()->user() ?? null, $merchantId, $paymentTypeId));
     }
 
     public function getPaymentModes(): JsonResponse
     {
-        return $this->successResponse($this->merchantService->getPaymentModes(request()->user()));
+        return $this->successResponse($this->merchantService->getPaymentModes(request()->user() ?? null));
     }
 
     public function pay( int $merchantId){

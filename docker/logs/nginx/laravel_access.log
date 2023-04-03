@@ -327,3 +327,5 @@
 172.19.0.1 - - [29/Mar/2023:18:03:45 +0000] "POST /api/v1/webhooks/paystack HTTP/1.1" 200 12 "-" "PostmanRuntime/7.31.3"
 172.19.0.1 - - [30/Mar/2023:14:37:07 +0000] "GET /api/v1/merchants/1/payment-types/1/form HTTP/1.1" 200 600 "-" "PostmanRuntime/7.31.3"
 172.19.0.1 - - [31/Mar/2023:17:37:16 +0000] "POST /api/v1/webhooks/paystack HTTP/1.1" 200 12 "-" "PostmanRuntime/7.31.3"
+172.19.0.1 - - [03/Apr/2023:14:26:11 +0000] "GET /api/v1/merchants?query=Kunde HTTP/1.1" 200 553 "-" "PostmanRuntime/7.31.3"
+172.19.0.1 - - [03/Apr/2023:14:26:24 +0000] "GET /api/v1/merchants HTTP/1.1" 200 5247 "-" "PostmanRuntime/7.31.3"
