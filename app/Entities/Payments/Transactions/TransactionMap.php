@@ -10,6 +10,7 @@ class TransactionMap
     public float $tax_amount;
     public int $user_id;
     public int $merchant_id;
+    public int $network_id;
     public string $status;
     public string $funds_location;
     public string $payment_method;
@@ -137,6 +138,16 @@ class TransactionMap
     public function setModelId(?int $model_id): TransactionMap
     {
         $this->model_id = $model_id;
+        return $this;
+    }
+
+    /**
+     * @param int $network_id
+     * @return TransactionMap
+     */
+    public function setNetworkId(int $network_id): TransactionMap
+    {
+        $this->network_id = $network_id;
         return $this;
     }
 }

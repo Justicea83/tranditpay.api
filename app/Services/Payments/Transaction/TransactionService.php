@@ -135,6 +135,8 @@ class TransactionService implements ITransactionService
                 case PendingAction::TYPE_FROM_FORM:
                     /** @var PendingPayFromForm $payload */
                     $payload = unserialize($pendingRequest->payload);
+                    /** @var PaymentApi $paymentApi */
+                    $paymentApi = $this->paymentApi->query()->where('name', $payload->provider)->first();
 
                     if (
                         $this->paymentService->verifyTransaction($payload->provider, $pendingRequest->reference)->valid
@@ -147,6 +149,7 @@ class TransactionService implements ITransactionService
                             ->setStatus(TransactionStatus::Completed->value)
                             ->setMerchantId($payload->merchantId)
                             ->setUserId($pendingRequest->owner_id)
+                            ->setNetworkId($paymentApi->id)
                             ->setModelId($payload->payment_type_id)
                             ->setModelType(PaymentType::class)
                             ->setPaymentMethod($payload->method)
