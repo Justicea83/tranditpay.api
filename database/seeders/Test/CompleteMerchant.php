@@ -6,8 +6,6 @@ use App\Models\Collection\Country;
 use App\Models\Merchant\Merchant;
 use App\Models\Payment\PaymentMode;
 use App\Models\Payment\PaymentType;
-use App\Models\Payment\SettlementBank;
-use App\Models\Payment\SettlementMode;
 use App\Models\Payment\Transaction;
 use App\Models\User;
 use App\Utils\Payments\Enums\FundsLocation;
@@ -72,18 +70,6 @@ class CompleteMerchant extends Seeder
                     PaymentType::factory()->create([
                         'merchant_id' => $merchant->id,
                         'name' => $item
-                    ]);
-                }
-
-
-                $settlementMode = SettlementMode::query()->where('name', 'bank')->first();
-                if ($settlementMode) {
-                    SettlementBank::query()->firstOrCreate([
-                        'merchant_id' => $merchant->id,
-                        'settlement_mode_id' => $settlementMode->id,
-                        'bank_name' => 'Access Bank',
-                        'account_name' => 'Justice Essien',
-                        'account_number' => '08100000000',
                     ]);
                 }
             }
