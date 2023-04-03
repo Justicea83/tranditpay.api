@@ -74,7 +74,7 @@ class TransactionService implements ITransactionService
         /** @var Merchant $merchant */
         $merchant = $this->merchant->query()->find($merchantId);
 
-        $ref = AppUtils::getToken();
+        $ref = uniqid().time();
 
         try {
             DB::beginTransaction();
