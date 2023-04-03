@@ -10,6 +10,7 @@ use App\Models\Payment\Transaction;
 use App\Models\User;
 use App\Utils\Payments\Enums\FundsLocation;
 use App\Utils\Payments\Enums\TransactionStatus;
+use App\Utils\StatusUtils;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -63,6 +64,7 @@ class CompleteMerchant extends Seeder
                 ->create([
                     'country_id' => $country->id,
                     'owner_id' => $user->id,
+                    'status' => StatusUtils::ACTIVE
                 ]);
 
             foreach ($user->merchants as $merchant) {

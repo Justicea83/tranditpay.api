@@ -84,7 +84,7 @@ class InitialPendingTransaction extends Command
                 'method' => $paymentMethod,
                 $paymentMethod => [
                     'provider' => 'MTN',
-                    'phone' => $status === 'success' ? '0243742088' : $faker->phoneNumber
+                    'phone' => $status === 'success' ? '0551234987' : $faker->phoneNumber
                 ]
             ],
             'merchant_id' => $merchantId,
