@@ -21,13 +21,13 @@ class DatabaseSeeder extends Seeder
         $this->call(PaymentApiTableSeeder::class);
         $this->call(SettlementModeTableSeeder::class);
         $this->call(PaymentModeTableSeeder::class);
-        $this->call(TestMerchantPaymentTypesSeeder::class);
 
         if (app()->environment(['local'])) {
             $this->call(CompleteMerchant::class);
-            /*Merchant::factory()
+            Merchant::factory()
                 ->count(400)
-                ->create();*/
+                ->create();
+            $this->call(TestMerchantPaymentTypesSeeder::class);
         }
 
 
