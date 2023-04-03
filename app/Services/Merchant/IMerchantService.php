@@ -13,7 +13,7 @@ interface IMerchantService
 
     public function createMerchant(?User $user, array $payload): ?Model;
 
-    public function getMerchants(User $user): LengthAwarePaginator;
+    public function getMerchants(?User $user): LengthAwarePaginator;
 
     public function getAllMerchants(?User $user): Collection;
 
@@ -21,9 +21,9 @@ interface IMerchantService
 
     public function getAllPaymentTypes(?User $user, int $merchantId): Collection;
 
-    public function getForm(User $user, int $merchantId, int $paymentTypeId): array;
+    public function getForm(?User $user, int $merchantId, int $paymentTypeId): array;
 
-    public function getPaymentModes(User $user): Collection;
+    public function getPaymentModes(?User $user): Collection;
 
     public function pay(User $user, int $merchantId, array $payload);
 }
