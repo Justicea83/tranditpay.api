@@ -3,13 +3,16 @@
 namespace App\Services\Payments\Paystack;
 
 use App\Entities\Payments\Paystack\Config\PaystackConfig;
-use App\Entities\Request\Payments\Paystack\PaystackCardRequest;
 use App\Entities\Request\Payments\Paystack\PaystackMomoRequest;
 use App\Entities\Request\Payments\Paystack\PaystackReceiptRequest;
 use App\Entities\Request\Payments\Paystack\PaystackTransferRequest;
 use App\Entities\Response\Payments\Paystack\PaystackResponse;
+use App\Models\Merchant\Merchant;
+use App\Models\Payment\Bank;
 use App\Models\User;
 use App\Utils\Payments\PaystackUtility;
+use App\Utils\StatusUtils;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,9 +20,11 @@ use Throwable;
 
 class PaystackService extends PaystackConfig implements IPaystackService
 {
-    public function initializePayment(PaystackCardRequest $request): PaystackResponse
+    public function __construct(
+        private readonly Bank $bank
+    )
     {
-        // TODO: Implement initializePayment() method.
+        parent::__construct();
     }
 
     public function momoPay(User $user, PaystackMomoRequest $request): ?PaystackResponse
@@ -73,5 +78,28 @@ class PaystackService extends PaystackConfig implements IPaystackService
     public function singleTransfer(PaystackTransferRequest $payload): PaystackResponse
     {
         return $this->call(PaystackUtility::TRANSFER_ENDPOINT, (array)$payload, 'post');
+    }
+
+    public function getMomoProviders(Merchant $merchant): Collection
+    {
+        $banks = $this->bank->query()
+            ->where('country_id', $merchant->country_id)
+            ->where('status', StatusUtils::ACTIVE)
+            ->where('extra_info->paystack->type', 'mobile_money')
+            ->get()
+            ->map(function (Bank $bank) {
+                $extraInfo = json_decode($bank->extra_info, true)['paystack'];
+                return [
+                    'name' => $extraInfo['name'],
+                    'code' => $extraInfo['code'],
+                ];
+            });
+
+        if (!$banks->count()) {
+            \App\Entities\Payments\Paystack\Bank::instance()->fetchAll($merchant->country->name);
+            return $this->getMomoProviders($merchant);
+        } else {
+            return $banks;
+        }
     }
 }

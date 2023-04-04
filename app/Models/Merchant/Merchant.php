@@ -26,6 +26,7 @@ use Laravel\Scout\Searchable;
  * @property mixed $id
  * @property mixed $about
  * @property SettlementBank $settlementBank
+ * @property mixed $country_id
  */
 class Merchant extends Model
 {
