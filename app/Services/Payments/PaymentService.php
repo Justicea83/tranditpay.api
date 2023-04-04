@@ -18,7 +18,7 @@ use App\Utils\Payments\Enums\FundsLocation;
 use App\Utils\Payments\Enums\TransactionStatus;
 use App\Utils\Payments\FlutterwaveUtility;
 use App\Utils\Payments\PaystackUtility;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Collection;
 use Symfony\Component\HttpFoundation\Response;
 
 class PaymentService implements IPaymentService
@@ -29,7 +29,9 @@ class PaymentService implements IPaymentService
         private readonly IPaystackService    $paystackService,
         private readonly IFlutterwaveService $flutterwaveService,
         private readonly Transaction         $transaction,
-        private readonly Settlement          $settlement
+        private readonly Settlement          $settlement,
+        private readonly Merchant            $merchant,
+        private readonly PaymentApi          $paymentApi,
     )
     {
     }
@@ -101,11 +103,11 @@ class PaymentService implements IPaymentService
 
     public function verifyTransaction(string $provider, string $ref): VerifyPaymentResponse
     {
-        if (config('app.env') == 'local') {
+        /*if (config('app.env') == 'local') {
             return VerifyPaymentResponse::instance()
                 ->setReference($ref)
                 ->setValid(true);
-        }
+        }*/
 
         switch ($provider) {
             case PaystackUtility::NAME:
@@ -118,9 +120,22 @@ class PaymentService implements IPaymentService
         return VerifyPaymentResponse::instance();
     }
 
-    public function getPaymentModes(User $user): array
+    public function getMomoProviders(int $merchantId): Collection
     {
-        // TODO: Implement getPaymentModes() method.
+        /** @var Merchant $merchant */
+        $merchant = $this->merchant->query()->find($merchantId);
+        $paymentApi = $this->getActivePaymentApi();
+
+        if (!$merchant || !$paymentApi) {
+            return collect([]);
+        }
+
+        if ($paymentApi->name === PaystackUtility::NAME) {
+            return $this->paystackService->getMomoProviders($merchant);
+        }
+
+        return collect([]);
+
     }
 
     public function submitOtp(array $data)
@@ -163,4 +178,10 @@ class PaymentService implements IPaymentService
         $transaction->funds_location = FundsLocation::Merchant->value;
     }
 
+    private function getActivePaymentApi(): ?PaymentApi
+    {
+        /** @var PaymentApi $activeProvider */
+        $activeProvider = $this->paymentApi->query()->active()->first();
+        return $activeProvider;
+    }
 }

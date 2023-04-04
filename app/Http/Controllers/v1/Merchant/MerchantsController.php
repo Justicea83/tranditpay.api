@@ -5,16 +5,14 @@ namespace App\Http\Controllers\v1\Merchant;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Merchant\CreateMerchantRequest;
 use App\Services\Merchant\IMerchantService;
+use App\Services\Payments\IPaymentService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 
 class MerchantsController extends Controller
 {
-    private IMerchantService $merchantService;
-
-    function __construct(IMerchantService $merchantService)
+    function __construct(private readonly IMerchantService $merchantService, private readonly IPaymentService $paymentService)
     {
-        $this->merchantService = $merchantService;
     }
 
     public function setup(CreateMerchantRequest $request): Response
@@ -48,7 +46,8 @@ class MerchantsController extends Controller
         return $this->successResponse($this->merchantService->getPaymentModes(request()->user() ?? null));
     }
 
-    public function pay( int $merchantId){
-
+    public function getMomoProviders(int $merchantId): JsonResponse
+    {
+        return $this->successResponse($this->paymentService->getMomoProviders($merchantId));
     }
 }

@@ -9,6 +9,7 @@ Route::prefix('v1/merchants')->group(function () {
         Route::post('setup', [MerchantsController::class, 'setup']);
         Route::get('', [MerchantsController::class, 'getMerchants']);
         Route::get('{id}/payment-types', [MerchantsController::class, 'getPaymentTypes']);
+        Route::get('{id}/momo-providers', [MerchantsController::class, 'getMomoProviders']);
         Route::get('{id}/payment-types/{paymentTypeId}/form', [MerchantsController::class, 'getForm']);
         Route::get('all', [MerchantsController::class, 'getAllMerchants']);
     });
@@ -16,6 +17,5 @@ Route::prefix('v1/merchants')->group(function () {
     //authenticated routes
     Route::middleware('auth:api')->group(function () {
         Route::get('payment-modes', [MerchantsController::class, 'getPaymentModes']);
-        Route::post('{id}/pay', [MerchantsController::class, 'pay']);
     });
 });

@@ -7,6 +7,7 @@ use App\Entities\Response\Payments\VerifyPaymentResponse;
 use App\Models\Merchant\Merchant;
 use App\Models\Payment\PaymentApi;
 use App\Models\User;
+use Illuminate\Support\Collection;
 
 interface IPaymentService
 {
@@ -14,9 +15,9 @@ interface IPaymentService
 
     public function verifyTransaction(string $provider, string $ref): VerifyPaymentResponse;
 
-    public function getPaymentModes(User $user): array;
-
     public function submitOtp(array $data);
+
+    public function getMomoProviders(int $merchantId): Collection;
 
     public function settlePaystackTransfer(string $event, array $data);
 

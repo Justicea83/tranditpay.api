@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('form_response_id')->constrained();
             $table->foreignId('form_field_id')->constrained();
-            $table->string('response');
+            $table->string('response')->nullable();
             $table->timestamps();
         });
     }
