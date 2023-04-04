@@ -24,7 +24,7 @@ class TransactionsController extends Controller
     public function getTransactionApplicableTax(ApplicableTaxRequest $request): JsonResponse
     {
         return $this->successResponse(
-            $this->transactionService->getTransactionApplicableTax($request->user(), $request->validated())
+            $this->transactionService->getTransactionApplicableTax($request->user() ?? null, $request->validated())
         );
     }
 

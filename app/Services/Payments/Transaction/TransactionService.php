@@ -192,7 +192,7 @@ class TransactionService implements ITransactionService
 
     }
 
-    public function getTransactionApplicableTax(User $user, array $payload): array
+    public function getTransactionApplicableTax(?User $user, array $payload): array
     {
         [
             'merchant_id' => $merchantId,

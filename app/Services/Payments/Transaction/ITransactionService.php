@@ -19,7 +19,7 @@ interface ITransactionService
 
     public function processPendingRequests();
 
-    public function getTransactionApplicableTax(User $user, array $payload): array;
+    public function getTransactionApplicableTax(?User $user, array $payload): array;
 
     public function processPendingRequest(PendingRequest $pendingRequest);
 
