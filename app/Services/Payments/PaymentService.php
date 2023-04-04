@@ -18,6 +18,8 @@ use App\Utils\Payments\Enums\FundsLocation;
 use App\Utils\Payments\Enums\TransactionStatus;
 use App\Utils\Payments\FlutterwaveUtility;
 use App\Utils\Payments\PaystackUtility;
+use Illuminate\Http\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 class PaymentService implements IPaymentService
 {
@@ -26,8 +28,8 @@ class PaymentService implements IPaymentService
     (
         private readonly IPaystackService    $paystackService,
         private readonly IFlutterwaveService $flutterwaveService,
-        private readonly Transaction $transaction,
-        private readonly Settlement $settlement
+        private readonly Transaction         $transaction,
+        private readonly Settlement          $settlement
     )
     {
     }
@@ -68,6 +70,9 @@ class PaymentService implements IPaymentService
                                 ->setReference($reference)
                                 ->setCurrency($currency)
                         )->transformToPaymentResponse($user);
+                }
+                if ($paymentMode === AppConstants::APP_PAYMENT_MODE_CARD) {
+                    return $response->setReference($reference)->setProcessed(false)->setProvider(PaystackUtility::NAME)->setCode(Response::HTTP_OK);
                 }
                 break;
             case FlutterwaveUtility::NAME:

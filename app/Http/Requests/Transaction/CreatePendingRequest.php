@@ -32,7 +32,6 @@ class CreatePendingRequest extends FormRequest
             'form.payment_type_id' => 'required_if:via_form,true|exists:payment_types,id',
             'form.responses' => 'required_if:via_form,true',
             'payment_info.method' => 'required|exists:payment_modes,name',
-            'payment_info.card' => 'required_if:payment_info.method,card',
             'payment_info.mobile_money' => 'required_if:payment_info.method,mobile_money',
         ];
     }
